@@ -177,6 +177,7 @@ svg.i{width:22px;height:22px;flex:none}
 .ci .nm{font-size:15.5px;font-weight:600;line-height:1.3}
 .ci .vr{font-size:13.5px;color:var(--muted)}
 .ci .bt{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px}
+.ci > .pr{flex:none}
 .ci .pr{font-weight:700;font-size:17px;font-variant-numeric:tabular-nums}
 .sum{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px 18px;display:flex;flex-direction:column;gap:9px;font-size:15.5px;margin-top:6px}
 .sum div{display:flex;justify-content:space-between;gap:10px;font-variant-numeric:tabular-nums}
@@ -410,6 +411,19 @@ I.repeat='<path d="M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L
 const byId = id => P.find(p=>p.id===id);
 const catOf = p => CATS.find(c=>c.id===p.cat);
 const DEFAULT_CART = () => [{id:'e6013',v:0,q:5},{id:'disco',v:1,q:1},{id:'m8',v:1,q:2}];
+const ORDERS=[
+ {no:'4821',date:'Hoje, 22/10 às 14:02',items:[['e6013',0,5],['disco',1,1],['m8',1,2]],ship:'moto',pay:'pix',status:'go',label:'A caminho',
+  steps:[['Pedido recebido','14:02',1],['Pagamento aprovado','Pix · 14:04',1],['Separado no estoque','Conferido por Jéssica · 14:21',1],['Saiu para entrega','Moto com Rogério · 14:38','now'],['Entregue','Previsto até 15:10',0]]},
+ {no:'4710',date:'08/10 às 09:15',items:[['c25',0,1],['er70',0,1],['luva',0,2]],ship:'truck',pay:'card',status:'ok',label:'Entregue',
+  steps:[['Pedido recebido','08/10 · 09:15',1],['Pagamento aprovado','Cartão em 3x · 09:16',1],['Separado no estoque','08/10 · 16:40',1],['Saiu para entrega','Caminhonete · 09/10 · 08:20',1],['Entregue','09/10 · 10:05 · recebido por Marcos',1]]},
+ {no:'4655',date:'29/09 às 16:40',items:[['m8',0,3],['rebite',0,2],['prego',0,5],['disco',0,10],['dobradica',1,2]],ship:'pickup',pay:'boleto',status:'ok',label:'Retirado',
+  steps:[['Pedido recebido','29/09 · 16:40',1],['Boleto pago','30/09 · 10:12',1],['Separado no estoque','30/09 · 11:00',1],['Pronto para retirada','30/09 · 11:05',1],['Retirado na loja','30/09 · 15:30 · por Marcos',1]]}];
+const ORD=no=>ORDERS.find(o=>o.no===no);
+const SHIP_L={moto:'Moto',truck:'Caminhonete agendada',pickup:'Retirada na loja'};
+function oTot(o){const sub=o.items.reduce((a,[id,v,q])=>a+byId(id).vars[v].p*q,0),fee={moto:14.90,truck:39.90,pickup:0}[o.ship],disc=o.pay==='pix'?sub*.05:0;return {sub,fee,disc,total:sub+fee-disc}}
+function payL(o,t){return o.pay==='pix'?'Pix com 5% de desconto':o.pay==='card'?'Cartão de crédito, 3x de '+brl(t.total/3):'Boleto bancário'}
+function oSummary(o){const names=o.items.map(([id])=>byId(id).sub.toLowerCase());return o.items.length+(o.items.length===1?' produto':' produtos')+' · '+SHIP_L[o.ship].toLowerCase()}
+
 const S = {screen:'home',hist:[],cat:'solda',q:'',prod:'c25',variant:0,qty:1,cart:DEFAULT_CART(),ship:'moto',pay:'pix',doc:'cpf',orderNo:'4821',layer:null};
 const $ = id => document.getElementById(id);
 const lineTotal = c => byId(c.id).vars[c.v].p*c.q;
@@ -434,7 +448,7 @@ const R = {
     <section class="hero">
       <div class="hero-h"><span>Seu pedido #${S.orderNo}</span><span class="pill-t">A caminho</span></div>
       <button class="prow" data-go="track"><span>Saiu da loja às 14:38</span>${chev()}</button>
-      <button class="prow" data-go="cart"><span>3 itens no pedido</span>${chev()}</button>
+      <button class="prow" data-order="4821"><span>3 itens no pedido</span>${chev()}</button>
       <button class="prow" data-go="track"><span>Entrega na Rua das Indústrias</span>${chev()}</button>
       <div class="hero-more">Código de entrega: 7314</div>
       <div class="hero-f"><span>Chega em cerca de 18 min</span><button class="wbtn" data-go="track">Acompanhar</button></div>
@@ -519,10 +533,25 @@ const R = {
       <ol class="tl">${st.map(s=>`<li class="${s[2]===1?'on':s[2]==='now'?'now':''}"><span class="dt">${s[2]===1?svg('check',3):''}</span><span><b>${s[0]}</b><small>${s[1]}</small></span></li>`).join('')}</ol></div>`;
   },
   orders(){
+    const ic={moto:'moto',truck:'truck',pickup:'store'};
     return `<div class="w"><section class="top"><h1 class="hello">Pedidos</h1></section>
-      <button class="orow" data-go="track"><span class="sq">${svg('moto',1.7)}</span><span><b>#${S.orderNo} · hoje</b><small>3 itens · moto</small></span><span class="st a">A caminho</span></button>
-      <button class="orow"><span class="sq">${svg('truck',1.7)}</span><span><b>#4710 · 08/10</b><small>Recarga C25 · caminhonete</small></span><span class="st b">Entregue</span></button>
-      <button class="orow"><span class="sq">${svg('store',1.7)}</span><span><b>#4655 · 29/09</b><small>12 itens · retirada na loja</small></span><span class="st b">Retirado</span></button></div>`;
+      ${ORDERS.map(o=>`<button class="orow" data-order="${o.no}"><span class="sq">${svg(ic[o.ship],1.7)}</span><span><b>#${o.no} · ${o.date}</b><small>${oSummary(o)} · ${brl(oTot(o).total)}</small></span><span class="st ${o.status==='go'?'a':'b'}">${o.label}</span></button>`).join('')}</div>`;
+  },
+  order(){
+    const o=ORD(S.order), t=oTot(o), live=o.status==='go';
+    return ph('Pedido #'+o.no,`<span class="st ${live?'a':'b'}">${o.label}</span>`)+`<div class="w">
+      <section class="hero" style="margin-top:6px"><div class="hero-h"><span>${o.date}</span><span class="pill-t">${SHIP_L[o.ship]}</span></div>
+        <div style="font-size:40px;font-weight:700;letter-spacing:-.03em;line-height:1">${brl(t.total)}</div>
+        <div class="prow" style="cursor:default"><span>${payL(o,t)}</span></div>
+        <div class="hero-f"><span>${o.items.length} produtos</span>${live?`<button class="wbtn" data-go="track">Acompanhar</button>`:`<button class="wbtn" data-reorder="${o.no}">Pedir de novo</button>`}</div></section>
+      <div class="lbl">Itens</div>
+      ${o.items.map(([id,v,q])=>{const p=byId(id),x=p.vars[v];return `<div class="ci"><span class="sq">${svg(catOf(p).icon,1.5)}</span><div><div class="nm">${p.name}</div><div class="vr">${x.l} · ${q} ${p.unit} × ${brl(x.p)}</div></div><span class="pr" style="font-weight:700;font-variant-numeric:tabular-nums">${brl(x.p*q)}</span></div>`}).join('')}
+      <div class="sum"><div><span>Produtos</span><span>${brl(t.sub)}</span></div><div><span>Entrega</span><span>${t.fee?brl(t.fee):'Grátis'}</span></div>${t.disc?`<div class="d"><span>Desconto Pix</span><span>−${brl(t.disc)}</span></div>`:''}<div class="t"><span>Total</span><span>${brl(t.total)}</span></div></div>
+      <div class="lbl">${o.ship==='pickup'?'Retirada':'Entrega'}</div>
+      <div class="box" style="margin-top:0">${o.ship==='pickup'?'DBC Gases e Locações<small>Rua Vinte de Maio, 320 · Bairro dos Cotianos · Piedade - SP</small>':'Rua das Indústrias, 450, galpão 3 · Distrito Industrial, Piedade - SP<small>Recebe: Marcos · (15) 9 8765-4321</small>'}</div>
+      <div class="lbl">Andamento</div>
+      <ol class="tl" style="margin-top:0">${o.steps.map(s=>`<li class="${s[2]===1?'on':s[2]==='now'?'now':''}"><span class="dt">${s[2]===1?svg('check',3):''}</span><span><b>${s[0]}</b><small>${s[1]}</small></span></li>`).join('')}</ol>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px"><button class="cta" style="min-width:150px" data-reorder="${o.no}">Pedir de novo</button><a class="cta ghost" style="min-width:150px" href="tel:+551533442737">${svg('phone',2)}Falar com a loja</a></div></div>`;
   },
   account(){
     const row=(i,b,s,attr='')=>`<button class="rowcard" style="margin-top:12px;box-shadow:none" ${attr}><span class="sq">${svg(i,1.7)}</span><span><b>${b}</b><small>${s}</small></span>${svg('chev',2).replace('class="i"','class="i chev"')}</button>`;
@@ -549,7 +578,7 @@ const LAYERS = {
 };
 const TABS=[{id:'home',l:'Início',i:'home'},{id:'orders',l:'Pedidos',i:'box'},{id:'fab'},{id:'search',l:'Buscar',i:'search'},{id:'account',l:'Perfil',i:'user'}];
 const NO_NAV=['prod','checkout','pix'];
-const tabOf=s=>({home:'home',orders:'orders',track:'orders',search:'search',cat:'search',account:'account',cart:'fab'})[s];
+const tabOf=s=>({home:'home',orders:'orders',order:'orders',track:'orders',search:'search',cat:'search',account:'account',cart:'fab'})[s];
 
 let timerId;
 function render(top=true){
@@ -590,6 +619,8 @@ document.addEventListener('click',e=>{
   if('cat2' in d){ S.cat=d.cat2; return render(false); }
   if('qs' in d){ S.q=d.qs; return render(false); }
   if('repeat' in d){ DEFAULT_CART().forEach(c=>addToCart(c.id,c.v,c.q)); toast('Último pedido no carrinho'); S.hist=[]; S.screen='cart'; return render(); }
+  if('order' in d){ S.order=d.order; return go('order'); }
+  if('reorder' in d){ ORD(d.reorder).items.forEach(([id,v,q])=>addToCart(id,v,q)); toast('Itens do pedido no carrinho'); S.hist=[]; S.screen='cart'; return render(); }
   if('p' in d){ S.prod=d.p; S.variant=0; S.qty=1; return go('prod'); }
   if('var' in d){ S.variant=+d.var; return render(false); }
   if('qty' in d){ S.qty=Math.max(1,S.qty+ +d.qty); return render(false); }

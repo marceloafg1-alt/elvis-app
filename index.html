@@ -228,6 +228,8 @@ svg.i{width:22px;height:22px;flex:none}
 .pill.okp{background:var(--ok-bg);color:var(--ok)}
 .orow{background:var(--surface);border:0;border-radius:18px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer;text-align:left;width:100%;box-shadow:inset 0 0 0 1px var(--line);font-size:14px;font-weight:600}
 .orow b{font-weight:800}
+a.cta{text-decoration:none}
+.lbl{margin-top:8px}
 .store{background:var(--head);color:#fff;border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px}
 .store .k{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#F5963A}
 .store b{font:700 18px/1.25 var(--f-display)}
@@ -450,6 +452,19 @@ const JUMPS = [
   {id:'pix',t:'Pagamento Pix',d:'QR Code e copia e cola'},{id:'track',t:'Acompanhar pedido',d:'Mapa, etapas e entregador'}
 ];
 const DEFAULT_CART = () => [{id:'e6013',v:0,q:5},{id:'disco',v:1,q:1},{id:'m8',v:1,q:2}];
+const ORDERS=[
+ {no:'4821',date:'Hoje, 22/10 às 14:02',items:[['e6013',0,5],['disco',1,1],['m8',1,2]],ship:'moto',pay:'pix',status:'go',label:'A caminho',
+  steps:[['Pedido recebido','14:02',1],['Pagamento aprovado','Pix · 14:04',1],['Separado no estoque','Conferido por Jéssica · 14:21',1],['Saiu para entrega','Moto com Rogério · 14:38','now'],['Entregue','Previsto até 15:10',0]]},
+ {no:'4710',date:'08/10 às 09:15',items:[['c25',0,1],['er70',0,1],['luva',0,2]],ship:'truck',pay:'card',status:'ok',label:'Entregue',
+  steps:[['Pedido recebido','08/10 · 09:15',1],['Pagamento aprovado','Cartão em 3x · 09:16',1],['Separado no estoque','08/10 · 16:40',1],['Saiu para entrega','Caminhonete · 09/10 · 08:20',1],['Entregue','09/10 · 10:05 · recebido por Marcos',1]]},
+ {no:'4655',date:'29/09 às 16:40',items:[['m8',0,3],['rebite',0,2],['prego',0,5],['disco',0,10],['dobradica',1,2]],ship:'pickup',pay:'boleto',status:'ok',label:'Retirado',
+  steps:[['Pedido recebido','29/09 · 16:40',1],['Boleto pago','30/09 · 10:12',1],['Separado no estoque','30/09 · 11:00',1],['Pronto para retirada','30/09 · 11:05',1],['Retirado na loja','30/09 · 15:30 · por Marcos',1]]}];
+const ORD=no=>ORDERS.find(o=>o.no===no);
+const SHIP_L={moto:'Moto',truck:'Caminhonete agendada',pickup:'Retirada na loja'};
+function oTot(o){const sub=o.items.reduce((a,[id,v,q])=>a+byId(id).vars[v].p*q,0),fee={moto:14.90,truck:39.90,pickup:0}[o.ship],disc=o.pay==='pix'?sub*.05:0;return {sub,fee,disc,total:sub+fee-disc}}
+function payL(o,t){return o.pay==='pix'?'Pix com 5% de desconto':o.pay==='card'?'Cartão de crédito, 3x de '+brl(t.total/3):'Boleto bancário'}
+function oSummary(o){const names=o.items.map(([id])=>byId(id).sub.toLowerCase());return o.items.length+(o.items.length===1?' produto':' produtos')+' · '+SHIP_L[o.ship].toLowerCase()}
+
 const S = {screen:'home',hist:[],cat:'solda',sub:'Todos',q:'',prod:'c25',variant:0,qty:1,cart:DEFAULT_CART(),ship:'moto',pay:'pix',cnpj:false,orderNo:'4821'};
 
 const view=document.getElementById('view'), tabEl=document.getElementById('tabbar'), sheet=document.getElementById('sheet');
@@ -585,9 +600,22 @@ const R = {
   },
   orders(){
     return `<div class="c narrow"><h1 class="big-title">Pedidos</h1><section class="sec">
-      <button class="orow" data-go="track"><span><b>#${S.orderNo}</b> · hoje<br><span class="unit">3 itens · moto</span></span><span class="pill go">A caminho</span></button>
-      <button class="orow"><span><b>#4710</b> · 08/10<br><span class="unit">Recarga C25 · caminhonete</span></span><span class="pill okp">Entregue</span></button>
-      <button class="orow"><span><b>#4655</b> · 29/09<br><span class="unit">12 itens · retirada</span></span><span class="pill okp">Retirado</span></button></section></div>`;
+      ${ORDERS.map(o=>`<button class="orow" data-order="${o.no}"><span><b>#${o.no}</b> · ${o.date}<br><span class="unit">${oSummary(o)} · ${brl(oTot(o).total)}</span></span><span class="pill ${o.status==='go'?'go':'okp'}">${o.label}</span></button>`).join('')}</section></div>`;
+  },
+  order(){
+    const o=ORD(S.order), t=oTot(o), live=o.status==='go';
+    return top('Pedido #'+o.no,{right:`<span class="pill ${live?'go':'okp'}">${o.label}</span>`})+`<div class="c narrow"><section class="sec">
+      <div class="card"><div class="k">Feito em</div>${o.date}<div class="unit">${SHIP_L[o.ship]} · ${payL(o,t)}</div></div>
+      ${live?`<button class="cta dark" data-go="track">${svg('moto',2)}Acompanhar no mapa</button>`:''}
+      <div class="lbl">Itens (${o.items.length})</div>
+      <div class="list">${o.items.map(([id,v,q])=>{const p=byId(id),x=p.vars[v];return `<div class="li">${thumb(p)}<div style="min-width:0"><div class="li-top">${p.name}</div><div class="li-var">${x.l} · ${q} ${p.unit} × ${brl(x.p)}</div><div class="li-bot"><span class="unit">${p.sku}</span><b class="price">${brl(x.p*q)}</b></div></div></div>`}).join('')}</div>
+      <div class="sum"><div class="r"><span>Produtos</span><span>${brl(t.sub)}</span></div><div class="r"><span>Entrega</span><span>${t.fee?brl(t.fee):'Grátis'}</span></div>${t.disc?`<div class="r disc"><span>Desconto Pix</span><span>−${brl(t.disc)}</span></div>`:''}<div class="r tot"><span>Total</span><span>${brl(t.total)}</span></div></div>
+      <div class="lbl">${o.ship==='pickup'?'Retirada':'Entrega'}</div>
+      <div class="card">${o.ship==='pickup'?'DBC Gases e Locações<div class="unit">Rua Vinte de Maio, 320 · Bairro dos Cotianos · Piedade - SP</div>':'Rua das Indústrias, 450, galpão 3 · Distrito Industrial, Piedade - SP<div class="unit">Recebe: Marcos · (15) 9 8765-4321</div>'}</div>
+      <div class="lbl">Andamento</div>
+      <ol class="steps">${o.steps.map(s=>`<li class="${s[2]===1?'done':s[2]==='now'?'now':''}"><span class="dot">${s[2]===1?svg('check',3):''}</span><span><b>${s[0]}</b><small>${s[1]}</small></span></li>`).join('')}</ol>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="cta" style="min-width:150px" data-reorder="${o.no}">Pedir de novo</button><a class="cta ghost" style="min-width:150px" href="tel:+551533442737">${svg('phone',2)}Falar com a loja</a></div>
+    </section></div>`;
   },
   account(){
     return `<div class="c narrow"><h1 class="big-title">Conta</h1><section class="sec">
@@ -607,7 +635,7 @@ const R = {
 const searchBody=()=>R._sb();
 const TABS=[{id:'home',l:'Início',i:'home'},{id:'search',l:'Buscar',i:'search'},{id:'cart',l:'Carrinho',i:'cart'},{id:'orders',l:'Pedidos',i:'box'},{id:'account',l:'Conta',i:'user'}];
 const NO_TABS=['prod','checkout','pix'];
-const tabOf=s=>({home:'home',search:'search',cat:'search',cart:'cart',orders:'orders',track:'orders',account:'account'})[s];
+const tabOf=s=>({home:'home',search:'search',cat:'search',cart:'cart',orders:'orders',order:'orders',track:'orders',account:'account'})[s];
 
 let timerId;
 function render(scrollTop=true){
@@ -654,6 +682,8 @@ document.addEventListener('click',e=>{
   if('cat' in d){ S.cat=d.cat; S.sub='Todos'; return go('cat'); }
   if('sub' in d){ S.sub=d.sub; return render(false); }
   if('qs' in d){ S.q=d.qs; return render(false); }
+  if('order' in d){ S.order=d.order; return go('order'); }
+  if('reorder' in d){ ORD(d.reorder).items.forEach(([id,v,q])=>{const ex=S.cart.find(c=>c.id===id&&c.v===v);ex?ex.q+=q:S.cart.push({id,v,q})}); toast('Itens do pedido no carrinho'); S.hist=[]; S.screen='cart'; return render(); }
   if('p' in d){ S.prod=d.p; S.variant=0; S.qty=1; return go('prod'); }
   if('var' in d){ S.variant=+d.var; return render(false); }
   if('qty' in d){ S.qty=Math.max(1,S.qty+ +d.qty); return render(false); }
