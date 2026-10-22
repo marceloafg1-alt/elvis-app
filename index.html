@@ -221,6 +221,16 @@ svg.i{width:22px;height:22px;flex:none}
 .pill.okp{background:var(--ok-bg);color:var(--ok)}
 .orow{background:var(--surface);border:0;border-radius:18px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer;text-align:left;width:100%;box-shadow:inset 0 0 0 1px var(--line);font-size:14px;font-weight:600}
 .orow b{font-weight:800}
+.store{background:var(--head);color:#fff;border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.store .k{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#F5963A}
+.store b{font:700 18px/1.25 var(--f-display)}
+.store p{margin:0;font-size:14px;line-height:1.5;color:#C9D6E4;font-weight:600}
+.store .tel{font:700 20px var(--f-display);color:#fff;user-select:all;font-variant-numeric:tabular-nums}
+.store .acts{display:flex;gap:8px;flex-wrap:wrap}
+.store a{flex:1;min-width:130px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;gap:8px;font:700 15px var(--f-display);text-decoration:none}
+.store a.call{background:var(--spark);color:var(--spark-ink)}
+.store a.route{background:rgba(255,255,255,.12);color:#fff}
+.store a svg{width:18px;height:18px}
 .menu{background:var(--surface);border-radius:18px;box-shadow:inset 0 0 0 1px var(--line);overflow:hidden}
 .menu button{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;border-bottom:1px solid var(--line);padding:14px 16px;font-size:14.5px;font-weight:700;cursor:pointer;text-align:left}
 .menu button:last-child{border-bottom:0}
@@ -370,10 +380,16 @@ const I = {
   wrench:'<path d="M14.5 4a5 5 0 0 0-4.6 6.9L3 17.8 6.2 21l6.9-6.9A5 5 0 0 0 20 9.5l-3 3-3.5-1-1-3.5 3-3z"/>',
   truck:'<path d="M2 6h11v10H2zM13 9h4l4 4v3h-8"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
   moto:'<circle cx="5.5" cy="16.5" r="3"/><circle cx="18.5" cy="16.5" r="3"/><path d="M5.5 16.5L9 10h5l4.5 6.5M12 10l-1-3H8M14 10l2-3h3"/>',
+  phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
   store:'<path d="M3 9l2-5h14l2 5M4 9v11h16V9M3 9h18M9 20v-6h6v6"/>'
 };
+const STORE_TEL='(15) 3344-2737';
+const MAPS='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent('Rua Vinte de Maio, 320, Bairro dos Cotianos, Piedade - SP, 18170-000');
 const svg = (k,sw=1.8) => `<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[k]}</svg>`;
 
+const STORE_HTML = () => `<div class="store"><div class="k">Nossa loja</div><b>DBC Gases e Locações</b>
+  <p>Rua Vinte de Maio, nº 320 · Bairro dos Cotianos<br>Piedade - SP · CEP 18170-000</p><div class="tel">${STORE_TEL}</div>
+  <div class="acts"><a class="call" href="tel:+551533442737">${svg('phone',2)}Ligar</a><a class="route" href="${MAPS}" target="_blank" rel="noopener">${svg('pin',2)}Como chegar</a></div></div>`;
 const CATS = [
   {id:'solda',name:'Soldagem',icon:'weld'},{id:'gas',name:'Gases',icon:'cyl'},
   {id:'eletricas',name:'Elétricas',icon:'drill'},{id:'fixacao',name:'Parafusos e rebites',icon:'screw'},
@@ -457,6 +473,7 @@ const R = {
         <div class="hscroll">${P.filter(p=>p.top).map(card).join('')}</div></section>
       <section class="sec"><div class="sec-h"><h3>Compre de novo</h3><span class="unit">do seu último pedido</span></div>
         <div class="grid">${['e6013','disco','luva','rebite'].map(id=>card(byId(id))).join('')}</div></section>
+      <section class="sec">${STORE_HTML()}</section>
     </div>`;
   },
   search(){
@@ -516,7 +533,7 @@ const R = {
     const ship=[
       {id:'moto',i:'moto',b:'Moto · hoje em até 3 h',s:gas?'Indisponível: o pedido tem cilindro':'Até 15 kg · seg. a sáb., 7h às 17h',a:14.90,dis:gas},
       {id:'truck',i:'truck',b:'Caminhonete · agendada',s:'Amanhã, 8h às 12h · cilindros e peso',a:39.90},
-      {id:'pickup',i:'store',b:'Retirar no balcão',s:'Pronto em 30 min · Av. Brasil, 1200',a:0}];
+      {id:'pickup',i:'store',b:'Retirar na loja',s:'Pronto em 30 min · Rua Vinte de Maio, 320, Piedade',a:0}];
     const pay=[
       {id:'pix',i:'pixi',b:'Pix',s:'5% de desconto · aprovação na hora',a:'−'+brl(t.sub*.05)},
       {id:'card',i:'card',b:'Cartão de crédito',s:'Até 10x sem juros de '+brl((t.sub+t.fee)/10),a:''},
@@ -524,7 +541,7 @@ const R = {
     return top('Entrega e pagamento')+`<div class="c narrow"><section class="sec">
       <div class="lbl">Como receber</div>
       <div class="choices">${ship.map(o=>`<button class="choice" role="radio" data-ship="${o.id}" aria-checked="${S.ship===o.id}" aria-disabled="${!!o.dis}"><span class="ci">${svg(o.i)}</span><span><b>${o.b}</b><small>${o.s}</small></span><span class="amt">${o.a?brl(o.a):'Grátis'}</span></button>`).join('')}</div>
-      ${S.ship!=='pickup'?`<div class="card"><div class="k">Endereço de entrega</div>Rua das Indústrias, 450, galpão 3 · Distrito Industrial<div class="unit">Recebe: Marcos · (11) 9 8765-4321</div></div>`:''}
+      ${S.ship!=='pickup'?`<div class="card"><div class="k">Endereço de entrega</div>Rua das Indústrias, 450, galpão 3 · Distrito Industrial, Piedade - SP<div class="unit">Recebe: Marcos · (15) 9 8765-4321</div></div>`:''}
       <div class="lbl" style="margin-top:8px">Como pagar</div>
       <div class="choices">${pay.map(o=>`<button class="choice" role="radio" data-pay="${o.id}" aria-checked="${S.pay===o.id}"><span class="ci">${svg(o.i)}</span><span><b>${o.b}</b><small>${o.s}</small></span><span class="amt" style="color:var(--ok)">${o.a}</span></button>`).join('')}</div>
       <div class="card trow"><div><div class="k">Nota fiscal</div>${S.cnpj?'CNPJ 12.345.678/0001-90 · Serralheria Silva':'CPF 123.456.789-00'}<div class="unit">Comprar como empresa</div></div>
@@ -541,7 +558,7 @@ const R = {
       <span class="timer">Pague em <span id="timer">14:59</span></span>
       <div class="qrw"><canvas id="qr" width="29" height="29" aria-label="QR Code Pix de exemplo"></canvas></div>
       <div><div class="unit">Pedido #${S.orderNo}</div><div class="bigprice">${brl(t.total)}</div></div>
-      <div class="code" id="pixcode">00020126580014BR.GOV.BCB.PIX0136exemplo-dbc-${S.orderNo}52040000530398654${t.total.toFixed(2)}5802BR5911DBC EXEMPLO6009SAO PAULO6304A1B2</div>
+      <div class="code" id="pixcode">00020126580014BR.GOV.BCB.PIX0136exemplo-dbc-${S.orderNo}52040000530398654${t.total.toFixed(2)}5802BR5911DBC EXEMPLO6007PIEDADE6304A1B2</div>
       <button class="cta ghost" data-copy style="width:100%;flex:none">Copiar código Pix</button>
       <div class="unit">Abra o app do banco, escolha Pix e leia o QR Code ou cole o código.</div></div></section></div>
     <div class="actionbar"><div class="c"><button class="cta dark" data-go="track">Simular pagamento aprovado</button></div></div>`;
@@ -573,7 +590,8 @@ const R = {
         <button>${svg('building')}<span>Dados da empresa (CNPJ)</span>${svg('chev',2)}</button>
         <button>${svg('card')}<span>Cartões salvos</span><small>1</small>${svg('chev',2)}</button>
         <button>${svg('heart')}<span>Listas por obra</span><small>3</small>${svg('chev',2)}</button>
-        <button>${svg('chat')}<span>Falar com a loja</span>${svg('chev',2)}</button></div>
+        <button>${svg('chat')}<span>Falar com a loja<br><small>(15) 3344-2737</small></span>${svg('chev',2)}</button></div>
+      ${STORE_HTML()}
       <div class="menu"><button data-open-sheet>${svg('info')}<span>Sobre este esboço<br><small>Funcionalidades, stack e próximos passos</small></span>${svg('chev',2)}</button></div>
     </section></div>`;
   }
