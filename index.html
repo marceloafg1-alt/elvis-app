@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Elvis">
+<meta name="theme-color" content="#121A23">
+<meta name="format-detection" content="telephone=no">
+<title>Elvis Solda e Ferramentas</title>
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%20%22Elvis%20Solda%20e%20Ferramentas%22%2C%20%22short_name%22%3A%20%22Elvis%22%2C%20%22display%22%3A%20%22standalone%22%2C%20%22background_color%22%3A%20%22%23121A23%22%2C%20%22theme_color%22%3A%20%22%23121A23%22%2C%20%22start_url%22%3A%20%22.%22%2C%20%22icons%22%3A%20%5B%7B%22src%22%3A%20%22data%3Aimage/svg%2Bxml%2C%253Csvg%2520xmlns%253D%2522http%253A//www.w3.org/2000/svg%2522%2520viewBox%253D%25220%25200%2520100%2520100%2522%253E%253Crect%2520width%253D%2522100%2522%2520height%253D%2522100%2522%2520rx%253D%252222%2522%2520fill%253D%2522%2523121A23%2522/%253E%253Crect%2520x%253D%252238%2522%2520y%253D%252238%2522%2520width%253D%252224%2522%2520height%253D%252224%2522%2520rx%253D%25225%2522%2520fill%253D%2522%2523FFB62E%2522%2520transform%253D%2522rotate%252845%252050%252050%2529%2522/%253E%253C/svg%253E%22%2C%20%22sizes%22%3A%20%22any%22%2C%20%22type%22%3A%20%22image/svg%2Bxml%22%7D%5D%7D">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2222%22%20fill%3D%22%23121A23%22/%3E%3Crect%20x%3D%2238%22%20y%3D%2238%22%20width%3D%2224%22%20height%3D%2224%22%20rx%3D%225%22%20fill%3D%22%23FFB62E%22%20transform%3D%22rotate%2845%2050%2050%29%22/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2222%22%20fill%3D%22%23121A23%22/%3E%3Crect%20x%3D%2238%22%20y%3D%2238%22%20width%3D%2224%22%20height%3D%2224%22%20rx%3D%225%22%20fill%3D%22%23FFB62E%22%20transform%3D%22rotate%2845%2050%2050%29%22/%3E%3C/svg%3E">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+body{margin:0;font:14px system-ui,-apple-system,sans-serif;-webkit-text-size-adjust:100%}
+img{max-width:100%}
+</style>
+
+<style>
+/* Layout: o app ocupa a tela inteira; conteúdo em coluna até 1080px, barra de abas flutuante embaixo, telas de compra com barra de ação fixa. */
+:root{
+  --bg:#F1F3F6; --surface:#FFFFFF; --soft:#E8ECF1; --ink:#10161D; --muted:#5D6874; --line:#DDE2E8;
+  --spark:#FFAE1A; --spark-ink:#1C1405; --steel:#2C3D4F; --ok:#16834A; --ok-bg:#E2F4E9; --warn:#995800; --warn-bg:#FFF1D6;
+  --glass:rgba(255,255,255,.82); --shadow:0 10px 30px -12px rgba(16,30,45,.28);
+  --head:#121A23; --head-2:#1D2A38;
+  --f-display:"Sora",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --gl:max(16px,env(safe-area-inset-left,0px)); --gr:max(16px,env(safe-area-inset-right,0px));
+  --sb:env(safe-area-inset-bottom,0px); --st:env(safe-area-inset-top,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0B1015; --surface:#151C24; --soft:#1C2530; --ink:#EDF1F5; --muted:#96A3B0; --line:#26303B;
+  --spark:#FFB62E; --spark-ink:#1C1405; --steel:#A9BFD4; --ok:#4FC985; --ok-bg:#11281B; --warn:#F5B95C; --warn-bg:#2B200E;
+  --glass:rgba(21,28,36,.84); --shadow:0 10px 30px -12px rgba(0,0,0,.7); --head:#0E151C; --head-2:#18232F; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B1015; --surface:#151C24; --soft:#1C2530; --ink:#EDF1F5; --muted:#96A3B0; --line:#26303B;
+  --spark:#FFB62E; --spark-ink:#1C1405; --steel:#A9BFD4; --ok:#4FC985; --ok-bg:#11281B; --warn:#F5B95C; --warn-bg:#2B200E;
+  --glass:rgba(21,28,36,.84); --shadow:0 10px 30px -12px rgba(0,0,0,.7); --head:#0E151C; --head-2:#18232F; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:var(--st);z-index:30;background:var(--bg)}
+button{font-family:inherit;color:inherit}
+.c{max-width:1080px;margin:0 auto;padding-left:var(--gl);padding-right:var(--gr)}
+#view{padding-bottom:calc(110px + var(--sb))}
+#view.has-bar{padding-bottom:calc(100px + var(--sb))}
+svg.i{width:22px;height:22px;flex:none}
+
+/* ---------- home header ---------- */
+.hero{background:radial-gradient(120% 90% at 85% 0%,#3A2A0C 0%,transparent 55%),linear-gradient(180deg,var(--head) 0%,var(--head-2) 100%);color:#fff;padding-block:18px 26px;border-radius:0 0 28px 28px}
+.hero .c{display:flex;flex-direction:column;gap:16px}
+.hrow{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.logo{font:700 20px/1 var(--f-display);display:flex;align-items:center;gap:8px;letter-spacing:-.01em}
+.logo i{width:12px;height:12px;border-radius:3px;background:#FFB62E;transform:rotate(45deg);box-shadow:0 0 14px 2px rgba(255,182,46,.7)}
+.addr{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:0;color:#fff;border-radius:20px;padding:6px 12px;font-size:12.5px;font-weight:600;cursor:pointer;min-width:0}
+.addr span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw}
+.addr svg{width:15px;height:15px}
+.hello{font:700 clamp(24px,6vw,34px)/1.12 var(--f-display);margin:0;letter-spacing:-.02em;text-wrap:balance}
+.hello em{font-style:normal;color:#FFB62E}
+.sfake{display:flex;align-items:center;gap:10px;background:#fff;color:#56616C;border:0;border-radius:16px;padding:14px 16px;font-size:15px;font-weight:500;cursor:pointer;text-align:left;width:100%;box-shadow:0 8px 24px -10px rgba(0,0,0,.5)}
+.sfake .i{color:#1C2732}
+
+.promos{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding-block:18px 4px;padding-left:var(--gl);padding-right:var(--gr);max-width:1080px;margin:0 auto}
+.promo{flex:0 0 min(82%,360px);scroll-snap-align:start;border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:6px;min-height:132px;position:relative;overflow:hidden;cursor:pointer;border:0;text-align:left}
+.promo b{font:700 19px/1.15 var(--f-display);letter-spacing:-.01em;max-width:75%}
+.promo span{font-size:13px;max-width:70%;opacity:.85}
+.promo svg{position:absolute;right:-6px;bottom:-8px;width:96px;height:96px;opacity:.9}
+.promo.a{background:var(--spark);color:var(--spark-ink)}
+.promo.b{background:var(--steel);color:var(--surface)}
+.promo.c2{background:var(--surface);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.promo.c2 svg{color:var(--spark)}
+
+.sec{padding-block:22px 0;display:flex;flex-direction:column;gap:14px}
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.sec-h h3{font:700 19px/1.2 var(--f-display);margin:0;letter-spacing:-.01em}
+.link{background:none;border:0;font-size:13.5px;font-weight:700;color:var(--muted);cursor:pointer;padding:0}
+.cats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px 10px}
+@media (min-width:760px){.cats{grid-template-columns:repeat(8,minmax(0,1fr))}}
+.cat{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;font-weight:700;line-height:1.2;text-align:center;cursor:pointer;padding:0}
+.cat .ico{width:100%;max-width:72px;aspect-ratio:1;border-radius:20px;background:var(--surface);display:grid;place-items:center;color:var(--steel);box-shadow:inset 0 0 0 1px var(--line)}
+.cat .ico svg{width:30px;height:30px}
+.cat:hover .ico{background:var(--soft)}
+
+.hscroll{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;margin-left:calc(-1 * var(--gl));margin-right:calc(-1 * var(--gr));padding-left:var(--gl);padding-right:var(--gr);padding-bottom:4px}
+.hscroll>*{flex:0 0 164px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px}
+@media (min-width:760px){.grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}}
+.pcard{background:var(--surface);border:0;border-radius:20px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;text-align:left;padding:0;box-shadow:inset 0 0 0 1px var(--line);transition:transform .15s}
+.pcard:hover{transform:translateY(-2px)}
+.thumb{aspect-ratio:1/1;max-width:100%;background:radial-gradient(80% 80% at 30% 20%,var(--surface) 0%,var(--soft) 100%);display:grid;place-items:center;color:var(--steel);position:relative;margin:6px;border-radius:15px}
+.thumb svg{width:44%;height:44%}
+.thumb .sku{position:absolute;left:10px;bottom:8px;font:500 9.5px var(--f-mono);color:var(--muted)}
+.tag{position:absolute;left:8px;top:8px;font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:8px;background:var(--spark);color:var(--spark-ink)}
+.plus{position:absolute;right:8px;bottom:8px;width:32px;height:32px;border-radius:11px;background:var(--ink);color:var(--surface);display:grid;place-items:center;font-size:20px;line-height:1}
+.pbody{padding:4px 12px 14px;display:flex;flex-direction:column;gap:4px;flex:1}
+.pname{font-size:13.5px;line-height:1.3;font-weight:600;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.6em}
+.price{font:700 17px/1.1 var(--f-display);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.unit{font:600 12px var(--f-body);color:var(--muted)}
+.pix{font-size:12px;color:var(--ok);font-weight:700}
+
+/* ---------- top bars ---------- */
+.topbar{position:sticky;top:var(--st);z-index:10;background:var(--glass);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--line)}
+.topbar .c{display:flex;align-items:center;gap:10px;min-height:60px}
+.topbar h2{font:700 18px/1.2 var(--f-display);margin:0;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-.01em}
+.ib{width:42px;height:42px;border-radius:14px;border:0;background:var(--soft);display:grid;place-items:center;cursor:pointer;flex:none}
+.big-title{font:700 28px/1.15 var(--f-display);letter-spacing:-.02em;margin:0;padding-block:22px 0}
+
+.sbox{flex:1;display:flex;align-items:center;gap:8px;background:var(--soft);border-radius:14px;padding:0 12px;height:44px}
+.sbox input{flex:1;min-width:0;border:0;background:transparent;font:600 15px var(--f-body);color:var(--ink);outline:none}
+.sbox .i{color:var(--muted);width:19px;height:19px}
+
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-block:14px 2px}
+.chip{flex:none;border:0;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);border-radius:30px;padding:8px 14px;font:700 13px var(--f-body);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--surface);box-shadow:none}
+
+/* ---------- product ---------- */
+.pd-hero{position:relative;background:radial-gradient(70% 70% at 50% 40%,var(--surface) 0%,var(--soft) 100%);padding-top:var(--st)}
+.pd-hero .art{max-width:520px;margin:0 auto;aspect-ratio:4/3;display:grid;place-items:center;color:var(--steel)}
+.pd-hero .art svg{width:38%;height:38%}
+.float{position:absolute;top:calc(var(--st) + 12px);display:flex;justify-content:space-between;left:var(--gl);right:var(--gr)}
+.float .ib{background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:var(--shadow)}
+.pd{background:var(--bg);border-radius:28px 28px 0 0;margin-top:-28px;position:relative;padding-top:24px}
+.pd .c{display:flex;flex-direction:column;gap:16px;max-width:720px}
+.brand{font:500 11px var(--f-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.pd h1{font:700 clamp(22px,5.6vw,30px)/1.15 var(--f-display);margin:4px 0 0;letter-spacing:-.02em;text-wrap:balance}
+.bigprice{font:700 32px/1 var(--f-display);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.lbl{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.opt{border:0;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);border-radius:14px;padding:12px 14px;font:700 14px var(--f-body);cursor:pointer;text-align:left;line-height:1.25}
+.opt small{display:block;font-weight:600;color:var(--muted);font-size:12px;margin-top:2px}
+.opt em{display:block;font-style:normal;font:700 14px var(--f-display);margin-top:6px;font-variant-numeric:tabular-nums}
+.opt[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--spark);background:var(--warn-bg)}
+.note{font-size:13px;border-radius:14px;padding:12px 14px;line-height:1.45;display:flex;gap:10px;align-items:flex-start;font-weight:600}
+.note svg{width:18px;height:18px;flex:none;margin-top:1px}
+.note.warn{background:var(--warn-bg);color:var(--warn)}
+.note.ok{background:var(--ok-bg);color:var(--ok)}
+.specs{width:100%;border-collapse:collapse;font-size:14px;background:var(--surface);border-radius:16px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--line)}
+.specs td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+.specs tr:last-child td{border-bottom:0}
+.specs td:first-child{color:var(--muted);width:42%;font-weight:600}
+
+/* ---------- fixed action bar ---------- */
+.actionbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--glass);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-top:1px solid var(--line);padding-top:12px;padding-bottom:calc(12px + var(--sb))}
+.actionbar .c{display:flex;gap:10px;align-items:center;max-width:720px}
+.stepper{display:flex;align-items:center;background:var(--soft);border-radius:14px;height:52px}
+.stepper button{width:42px;height:100%;border:0;background:none;font-size:22px;cursor:pointer}
+.stepper span{min-width:24px;text-align:center;font-weight:800;font-variant-numeric:tabular-nums}
+.stepper.sm{height:36px;border-radius:11px}.stepper.sm button{width:32px;font-size:18px}
+.cta{flex:1;height:54px;border:0;border-radius:16px;background:var(--spark);color:var(--spark-ink);font:700 16px var(--f-display);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:-.01em;box-shadow:0 8px 20px -8px rgba(255,166,0,.6)}
+.cta.ghost{background:var(--soft);color:var(--ink);box-shadow:none}
+.cta.dark{background:var(--ink);color:var(--surface);box-shadow:none}
+
+/* ---------- cart / checkout ---------- */
+.list{display:flex;flex-direction:column;gap:10px}
+.li{background:var(--surface);border-radius:18px;padding:10px;display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;box-shadow:inset 0 0 0 1px var(--line)}
+.li .thumb{margin:0;border-radius:13px}
+.li-top{font-size:14px;font-weight:700;line-height:1.3}
+.li-var{font-size:12.5px;color:var(--muted);font-weight:600}
+.li-bot{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px}
+.sum{background:var(--surface);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:8px;font-size:14px;font-weight:600;box-shadow:inset 0 0 0 1px var(--line)}
+.sum .r{display:flex;justify-content:space-between;gap:8px;font-variant-numeric:tabular-nums}
+.sum .r span:first-child{color:var(--muted)}
+.sum .r.tot{font:700 22px var(--f-display);border-top:1px dashed var(--line);padding-top:12px;margin-top:4px}
+.sum .r.tot span:first-child{color:var(--ink)}
+.sum .r.disc,.sum .r.disc span:first-child{color:var(--ok)}
+.choices{display:flex;flex-direction:column;gap:8px}
+.choice{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--surface);border:0;box-shadow:inset 0 0 0 1.5px var(--line);border-radius:18px;padding:12px 14px 12px 12px;cursor:pointer;text-align:left;width:100%}
+.choice .ci{width:44px;height:44px;border-radius:13px;background:var(--soft);display:grid;place-items:center;color:var(--steel)}
+.choice[aria-checked="true"]{box-shadow:inset 0 0 0 2px var(--spark)}
+.choice[aria-checked="true"] .ci{background:var(--spark);color:var(--spark-ink)}
+.choice[aria-disabled="true"]{opacity:.45;cursor:not-allowed}
+.choice b{font-size:14.5px;display:block;font-weight:800}
+.choice small{font-size:12.5px;color:var(--muted);display:block;line-height:1.35;font-weight:600}
+.choice .amt{font-weight:800;font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.card{background:var(--surface);border-radius:18px;padding:14px 16px;font-size:14px;line-height:1.45;box-shadow:inset 0 0 0 1px var(--line);font-weight:600}
+.card .k{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:2px}
+.trow{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.switch{width:50px;height:30px;border-radius:15px;background:var(--line);border:0;position:relative;cursor:pointer;flex:none}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.switch[aria-checked="true"]{background:var(--ok)}
+.switch[aria-checked="true"]::after{left:23px}
+.narrow{max-width:720px}
+
+/* ---------- pix ---------- */
+.pixbox{background:var(--surface);border-radius:24px;padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;box-shadow:inset 0 0 0 1px var(--line)}
+.qrw{background:#fff;padding:12px;border-radius:18px;box-shadow:inset 0 0 0 1px var(--line)}
+.qrw canvas{width:200px;height:200px;image-rendering:pixelated;display:block}
+.code{font:500 11px var(--f-mono);color:var(--muted);word-break:break-all;background:var(--soft);border-radius:12px;padding:10px;width:100%;user-select:all}
+.timer{display:inline-flex;gap:6px;align-items:center;background:var(--warn-bg);color:var(--warn);font-weight:800;font-size:13px;border-radius:20px;padding:5px 12px;font-variant-numeric:tabular-nums}
+
+/* ---------- tracking ---------- */
+.map{height:240px;background:
+  repeating-linear-gradient(0deg,transparent 0 31px,var(--line) 31px 32px),
+  repeating-linear-gradient(90deg,transparent 0 31px,var(--line) 31px 32px),var(--soft);position:relative}
+.map svg{position:absolute;inset:0;width:100%;height:100%}
+.eta{margin-top:-36px;position:relative}
+.eta .card{display:flex;justify-content:space-between;align-items:center;gap:12px;box-shadow:var(--shadow),inset 0 0 0 1px var(--line)}
+.eta b{font:700 34px/1 var(--f-display);display:block;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.steps li{display:grid;grid-template-columns:26px minmax(0,1fr);gap:14px;position:relative;padding-bottom:18px}
+.steps li::before{content:"";position:absolute;left:12px;top:24px;bottom:0;width:2px;background:var(--line)}
+.steps li:last-child::before{display:none}
+.steps li.done::before{background:var(--ok)}
+.dot{width:26px;height:26px;border-radius:50%;background:var(--soft);display:grid;place-items:center;z-index:1}
+.steps li.done .dot{background:var(--ok);color:#fff}
+.steps li.now .dot{background:var(--spark);box-shadow:0 0 0 6px rgba(255,174,26,.3)}
+.dot svg{width:14px;height:14px}
+.steps b{font-size:14.5px;display:block;font-weight:800}
+.steps small{color:var(--muted);font-size:13px;font-weight:600}
+.driver{display:flex;gap:12px;align-items:center}
+.avatar{width:46px;height:46px;border-radius:15px;background:var(--steel);color:var(--surface);display:grid;place-items:center;font:700 18px var(--f-display);flex:none}
+.pill{font-size:11.5px;font-weight:800;padding:4px 10px;border-radius:20px;white-space:nowrap}
+.pill.go{background:var(--warn-bg);color:var(--warn)}
+.pill.okp{background:var(--ok-bg);color:var(--ok)}
+.orow{background:var(--surface);border:0;border-radius:18px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer;text-align:left;width:100%;box-shadow:inset 0 0 0 1px var(--line);font-size:14px;font-weight:600}
+.orow b{font-weight:800}
+.menu{background:var(--surface);border-radius:18px;box-shadow:inset 0 0 0 1px var(--line);overflow:hidden}
+.menu button{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;border-bottom:1px solid var(--line);padding:14px 16px;font-size:14.5px;font-weight:700;cursor:pointer;text-align:left}
+.menu button:last-child{border-bottom:0}
+.menu button span{flex:1}
+.menu button small{color:var(--muted);font-weight:600}
+.profile{display:flex;align-items:center;gap:14px}
+.profile .avatar{width:58px;height:58px;border-radius:19px;font-size:22px}
+.empty{padding:56px 24px;text-align:center;color:var(--muted);display:flex;flex-direction:column;gap:16px;align-items:center;font-weight:600}
+.empty svg{width:56px;height:56px;color:var(--line)}
+
+/* ---------- floating tab bar ---------- */
+.tabbar{position:fixed;z-index:20;left:var(--gl);right:var(--gr);bottom:calc(12px + var(--sb));max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);background:var(--glass);backdrop-filter:saturate(1.6) blur(18px);-webkit-backdrop-filter:saturate(1.6) blur(18px);border-radius:24px;padding:6px;box-shadow:var(--shadow),inset 0 0 0 1px var(--line)}
+.tab{background:none;border:0;color:var(--muted);font:700 10.5px/1.2 var(--f-body);display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 6px;cursor:pointer;position:relative;border-radius:18px}
+.tab[aria-current="true"]{color:var(--ink);background:var(--soft)}
+.tab[aria-current="true"] .i{color:var(--spark)}
+.badge{position:absolute;top:3px;left:calc(50% + 5px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--spark);color:var(--spark-ink);font-size:10.5px;font-weight:800;display:grid;place-items:center}
+.toast{position:fixed;left:50%;bottom:calc(96px + var(--sb));transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:11px 16px;border-radius:14px;font-size:13.5px;font-weight:700;white-space:nowrap;z-index:40;display:flex;gap:8px;align-items:center;box-shadow:var(--shadow)}
+.toast svg{width:16px;height:16px;color:var(--spark)}
+
+/* ---------- notes sheet (fora do app) ---------- */
+.sheet{position:fixed;inset:0;z-index:60;background:var(--bg);overflow-y:auto;padding-top:var(--st);padding-bottom:calc(40px + var(--sb))}
+.sheet .c{max-width:880px;display:flex;flex-direction:column;gap:30px}
+.sheet-top{position:sticky;top:0;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);z-index:2}
+.sheet-top .c{flex-direction:row;align-items:center;gap:10px;min-height:60px}
+.eyebrow{font:500 12px var(--f-mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.sheet h1{font:700 clamp(28px,6vw,40px)/1.1 var(--f-display);margin:6px 0 10px;letter-spacing:-.02em;text-wrap:balance}
+.sheet h2{font:700 20px/1.2 var(--f-display);margin:0 0 12px;letter-spacing:-.01em}
+.lede{font-size:16px;max-width:64ch;margin:0;font-weight:500}
+.jumps{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;list-style:none;margin:0;padding:0;counter-reset:j}
+.jumps button{counter-increment:j;width:100%;display:grid;grid-template-columns:auto minmax(0,1fr);gap:0 12px;align-items:center;text-align:left;background:var(--surface);border:0;box-shadow:inset 0 0 0 1px var(--line);border-radius:14px;padding:10px 14px;cursor:pointer}
+.jumps button::before{content:counter(j);grid-row:1/3;font:700 20px var(--f-display);color:var(--spark)}
+.jumps b{font-size:14px;font-weight:800}
+.jumps small{color:var(--muted);font-size:12.5px;font-weight:600}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px}
+.feat h3{font:800 15px var(--f-body);margin:0 0 8px;display:flex;align-items:center;gap:8px}
+.feat ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-weight:500}
+.feat li span{color:var(--muted)}
+.phase{font-size:11px;font-weight:800;padding:2px 9px;border-radius:20px;background:var(--spark);color:var(--spark-ink)}
+.phase.two{background:var(--soft);color:var(--ink)}
+.tw{overflow-x:auto}
+.stack{width:100%;border-collapse:collapse;font-size:14px;min-width:520px}
+.stack th,.stack td{text-align:left;padding:10px 12px 10px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.stack th{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.stack td:first-child{font-weight:800;white-space:nowrap}
+.stack td:last-child{color:var(--muted);font-weight:500}
+.next{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;max-width:68ch;font-weight:500}
+.fine{font-size:13px;color:var(--muted);margin:0;max-width:68ch}
+button:focus-visible,input:focus-visible{outline:2px solid var(--spark);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+
+<div id="view"></div>
+<nav class="tabbar" id="tabbar" aria-label="Navegação"></nav>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-top"><div class="c"><button class="ib" data-close-sheet aria-label="Fechar"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><b style="font-weight:800">Sobre este esboço</b></div></div>
+  <div class="c" style="padding-top:24px">
+    <header>
+      <div class="eyebrow">Esboço v0.2 · app de compra e entrega</div>
+      <h1>Elvis Solda e Ferramentas</h1>
+      <p class="lede">App para o cliente comprar consumíveis de solda, gás, ferramentas elétricas e ferragens pelo celular, pagar com Pix, cartão ou boleto e receber na obra no mesmo dia. O nome da loja é provisório.</p>
+    </header>
+    <section><h2>Ir direto para uma tela</h2><ol class="jumps" id="jumps"></ol></section>
+    <section>
+      <h2>O que o app faz</h2>
+      <div class="cols">
+        <div class="feat"><h3><span class="phase">Versão 1</span> Comprar</h3><ul>
+          <li>Catálogo por categoria: solda, gases, elétricas, fixação, abrasivos, EPI, ferragens e manuais</li>
+          <li>Busca por nome, código ou medida <span>(ex.: “M8”, “6013”, “4.1/2”)</span></li>
+          <li>Venda na unidade certa: kg, cento, caixa, rolo, par, recarga</li>
+          <li>Gás com opção de recarga (troca do casco) ou cilindro novo</li>
+          <li>Estoque da loja visível no produto</li></ul></div>
+        <div class="feat"><h3><span class="phase">Versão 1</span> Pagar e receber</h3><ul>
+          <li>Pix com desconto, cartão em até 10x e boleto para CNPJ</li>
+          <li>Moto em até 3 h, caminhonete agendada para cilindros e peso, ou retirada no balcão</li>
+          <li>CPF ou CNPJ com nota fiscal automática</li>
+          <li>Acompanhamento do pedido com etapas e aviso no celular</li>
+          <li>Painel da loja: pedidos, estoque, preços e entregadores</li></ul></div>
+        <div class="feat"><h3><span class="phase two">Depois</span> Fidelizar</h3><ul>
+          <li>“Compre de novo” e listas salvas por obra</li>
+          <li>Orçamento enviando foto ou lista de materiais</li>
+          <li>Conta empresa com vários compradores e faturamento</li>
+          <li>Lembrete de recarga de gás pelo consumo médio</li>
+          <li>Cupons e programa de pontos</li></ul></div>
+      </div>
+    </section>
+    <section>
+      <h2>Stack sugerida</h2>
+      <div class="tw"><table class="stack">
+        <thead><tr><th>Parte</th><th>Escolha</th><th>Por quê</th></tr></thead>
+        <tbody>
+          <tr><td>App do cliente</td><td>React Native com Expo</td><td>Um código para Android e iPhone, publicação nas lojas simplificada</td></tr>
+          <tr><td>Painel da loja</td><td>Next.js (web)</td><td>Balcão e gerente usam no computador, sem instalar nada</td></tr>
+          <tr><td>Backend e banco</td><td>Supabase (Postgres)</td><td>Login, banco, fotos dos produtos e tempo real para o rastreio</td></tr>
+          <tr><td>Pagamentos</td><td>Mercado Pago ou Asaas</td><td>Pix, cartão parcelado e boleto numa só integração</td></tr>
+          <tr><td>Estoque e NF-e</td><td>Bling ou Tiny (ERP)</td><td>Se a loja já usa um ERP, o app lê estoque e emite nota por ele</td></tr>
+          <tr><td>Entrega</td><td>App do entregador + Google Maps</td><td>Frota própria com rota e localização; Lalamove como reforço</td></tr>
+          <tr><td>Avisos</td><td>Expo Push + WhatsApp</td><td>“Pagamento aprovado”, “saiu para entrega” e “entregue”</td></tr>
+        </tbody></table></div>
+    </section>
+    <section>
+      <h2>Próximos passos</h2>
+      <ol class="next">
+        <li>Confirmar nome, logo e cores da loja.</li>
+        <li>Levantar o catálogo inicial (uns 200 itens mais vendidos) com fotos e unidades de venda.</li>
+        <li>Definir área e preço de entrega: raio da moto, dias da caminhonete, regra para cilindros.</li>
+        <li>Escolher o meio de pagamento e abrir a conta da loja nele.</li>
+        <li>Construir a versão 1 e testar com 10 clientes da loja antes de publicar.</li>
+      </ol>
+    </section>
+    <p class="fine">Preços, produtos, nomes e endereços são exemplos para mostrar o funcionamento. Marcas aparecem só como itens do catálogo. Nada é cobrado.</p>
+  </div>
+</div>
+
+<script>
+window.addEventListener('error',function(e){var v=document.getElementById('view');if(v&&!v.innerHTML)v.innerHTML='<div style="padding:24px;font:14px system-ui">Não foi possível abrir o protótipo neste aparelho.<br><small>'+(e.message||'')+'</small></div>'});
+(function(){
+const brl = n => n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const I = {
+  home:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
+  search:'<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',
+  cart:'<path d="M3 4h2l2.4 11.2a1.5 1.5 0 0 0 1.5 1.3h8.7a1.5 1.5 0 0 0 1.5-1.2L21 8H6.2"/><circle cx="9.5" cy="20" r="1.3"/><circle cx="17.5" cy="20" r="1.3"/>',
+  box:'<path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+  back:'<path d="M15 5l-7 7 7 7"/>',
+  heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+  pin:'<path d="M12 21s-6-5.6-6-11a6 6 0 0 1 12 0c0 5.4-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/>',
+  check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/>',
+  chev:'<path d="M9 5l7 7-7 7"/>',
+  doc:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/>',
+  building:'<path d="M4 21V5l8-2v18M12 8h8v13M8 8v.01M8 12v.01M8 16v.01M16 12v.01M16 16v.01M2 21h20"/>',
+  card:'<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18M7 15h4"/>',
+  pixi:'<path d="M12 3l9 9-9 9-9-9z"/><path d="M8 12l4-4 4 4-4 4z"/>',
+  barcode:'<path d="M4 6v12M7 6v12M10 6v12M14 6v12M16 6v12M20 6v12"/>',
+  chat:'<path d="M4 5h16v11H9l-5 4z"/>',
+  weld:'<path d="M4 20l7-7"/><path d="M11 13l2-2 3 3-2 2z"/><path d="M16 8l1.5-1.5M19 11l1.5-.5M14 5l.5-1.5M19 5l-1 1"/><rect x="2" y="19" width="8" height="2" rx="1"/>',
+  cyl:'<rect x="7" y="6" width="10" height="16" rx="4"/><path d="M10 6V3h4v3M9 2h6"/>',
+  drill:'<path d="M3 7h11a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2H9l-1 9H5l1-9"/><path d="M16 8.5h3M19 7.5v3l3-1.5"/>',
+  screw:'<path d="M8 3h8l-1 3H9z"/><path d="M10 6h4v10l-2 5-2-5z"/><path d="M10 9l4 1.5M10 12l4 1.5"/>',
+  disc:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.2"/><path d="M12 3v3M12 18v3"/>',
+  mask:'<path d="M5 5h14v9a7 7 0 0 1-14 0z"/><rect x="8" y="8" width="8" height="4" rx="1"/>',
+  hinge:'<rect x="4" y="3" width="7" height="18" rx="1"/><rect x="13" y="3" width="7" height="18" rx="1"/><circle cx="7.5" cy="7" r="1"/><circle cx="7.5" cy="17" r="1"/><circle cx="16.5" cy="7" r="1"/><circle cx="16.5" cy="17" r="1"/>',
+  wrench:'<path d="M14.5 4a5 5 0 0 0-4.6 6.9L3 17.8 6.2 21l6.9-6.9A5 5 0 0 0 20 9.5l-3 3-3.5-1-1-3.5 3-3z"/>',
+  truck:'<path d="M2 6h11v10H2zM13 9h4l4 4v3h-8"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
+  moto:'<circle cx="5.5" cy="16.5" r="3"/><circle cx="18.5" cy="16.5" r="3"/><path d="M5.5 16.5L9 10h5l4.5 6.5M12 10l-1-3H8M14 10l2-3h3"/>',
+  store:'<path d="M3 9l2-5h14l2 5M4 9v11h16V9M3 9h18M9 20v-6h6v6"/>'
+};
+const svg = (k,sw=1.8) => `<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[k]}</svg>`;
+
+const CATS = [
+  {id:'solda',name:'Soldagem',icon:'weld'},{id:'gas',name:'Gases',icon:'cyl'},
+  {id:'eletricas',name:'Elétricas',icon:'drill'},{id:'fixacao',name:'Parafusos e rebites',icon:'screw'},
+  {id:'abrasivos',name:'Discos',icon:'disc'},{id:'epi',name:'EPI',icon:'mask'},
+  {id:'ferragens',name:'Ferragens',icon:'hinge'},{id:'manuais',name:'Manuais',icon:'wrench'}
+];
+const P = [
+  {id:'inv160',cat:'solda',sub:'Máquinas',name:'Inversora de solda MMA 160 A bivolt',brand:'Linha profissional',sku:'SD-160MMA',unit:'un',stock:6,top:true,
+    vars:[{l:'160 A',p:689.90},{l:'200 A',p:899.00,s:'até eletrodo 4,0 mm'}],
+    specs:[['Corrente','20 a 160 A'],['Tensão','127 / 220 V automático'],['Eletrodo','até 3,25 mm'],['Ciclo de trabalho','60% a 160 A'],['Garantia','12 meses']]},
+  {id:'mig200',cat:'solda',sub:'Máquinas',name:'Máquina MIG/MAG 200 A com e sem gás',brand:'Linha profissional',sku:'SD-MIG200',unit:'un',stock:3,
+    vars:[{l:'200 A',p:2390.00}],specs:[['Arame','0,6 a 1,0 mm'],['Tensão','220 V'],['Modo','MIG, MAG, arame tubular e eletrodo'],['Garantia','12 meses']]},
+  {id:'e6013',cat:'solda',sub:'Consumíveis',name:'Eletrodo revestido E6013',brand:'Consumível',sku:'EL-6013',unit:'kg',stock:180,top:true,
+    vars:[{l:'2,5 mm',p:32.90},{l:'3,25 mm',p:31.50},{l:'4,0 mm',p:30.90}],specs:[['Norma','AWS A5.1 E6013'],['Posição','todas'],['Corrente','CA ou CC'],['Venda','por kg (lata de 5 kg ou avulso)']]},
+  {id:'er70',cat:'solda',sub:'Consumíveis',name:'Arame MIG ER70S-6 cobreado, rolo 15 kg',brand:'Consumível',sku:'AR-ER70S6',unit:'rolo',stock:22,
+    vars:[{l:'0,8 mm',p:389.00},{l:'1,0 mm',p:379.00}],specs:[['Norma','AWS A5.18 ER70S-6'],['Gás indicado','Ar/CO₂ (C25) ou CO₂'],['Peso','15 kg']]},
+  {id:'c25',cat:'gas',sub:'Gás para MIG',name:'Gás Ar/CO₂ C25 para solda MIG, cilindro 10 m³',brand:'Gás industrial',sku:'GS-C25-10',unit:'cilindro',stock:14,top:true,gas:true,tag:'Recarga',
+    vars:[{l:'Recarga',s:'troca pelo seu casco',p:289.00},{l:'Cilindro novo + gás',s:'cilindro de aço próprio',p:1890.00}],
+    specs:[['Mistura','75% argônio + 25% CO₂'],['Volume','10 m³ (≈ 9 kg)'],['Válvula','padrão CGA 580'],['Transporte','somente caminhonete, em pé e amarrado']]},
+  {id:'o2',cat:'gas',sub:'Oxicorte',name:'Oxigênio industrial, cilindro 10 m³',brand:'Gás industrial',sku:'GS-O2-10',unit:'cilindro',stock:9,gas:true,
+    vars:[{l:'Recarga',s:'troca do casco',p:159.00},{l:'Cilindro novo + gás',p:1490.00}],specs:[['Pureza','99,5%'],['Volume','10 m³'],['Transporte','somente caminhonete']]},
+  {id:'df333',cat:'eletricas',sub:'Parafusadeiras',name:'Parafusadeira e furadeira Makita 12 V DF333DWYE',brand:'Makita',sku:'MK-DF333',unit:'un',stock:5,top:true,tag:'10x sem juros',
+    vars:[{l:'2 baterias + maleta',p:899.00}],specs:[['Bateria','12 V Li-ion, 1,5 Ah (2 un)'],['Torque','30 N·m'],['Mandril','3/8" (10 mm)'],['Garantia','12 meses Makita']]},
+  {id:'ga4530',cat:'eletricas',sub:'Esmerilhadeiras',name:'Esmerilhadeira angular Makita 4.1/2" 720 W GA4530',brand:'Makita',sku:'MK-GA4530',unit:'un',stock:8,
+    vars:[{l:'127 V',p:349.00},{l:'220 V',p:349.00}],specs:[['Disco','4.1/2" (115 mm)'],['Potência','720 W'],['Rotação','11.000 rpm']]},
+  {id:'fur650',cat:'eletricas',sub:'Furadeiras',name:'Furadeira de impacto 1/2" 650 W',brand:'Linha profissional',sku:'FD-650',unit:'un',stock:11,
+    vars:[{l:'127 V',p:289.00},{l:'220 V',p:289.00}],specs:[['Mandril','1/2" (13 mm)'],['Potência','650 W'],['Impacto','até 48.000 ipm']]},
+  {id:'m8',cat:'fixacao',sub:'Parafusos',name:'Parafuso sextavado M8 zincado com porca',brand:'Fixação',sku:'PF-M8-ZN',unit:'cento',stock:60,top:true,
+    vars:[{l:'M8 x 20',p:22.90},{l:'M8 x 30',p:24.90},{l:'M8 x 50',p:31.90}],specs:[['Rosca','métrica grossa 1,25'],['Classe','8.8'],['Acabamento','zincado branco'],['Venda','cento (100 un)']]},
+  {id:'rebite',cat:'fixacao',sub:'Rebites',name:'Rebite POP alumínio 4,0 x 12 mm, caixa 500',brand:'Fixação',sku:'RB-4012',unit:'caixa',stock:35,
+    vars:[{l:'4,0 x 12',p:39.90},{l:'4,8 x 16',p:54.90}],specs:[['Corpo','alumínio'],['Haste','aço'],['Quantidade','500 un']]},
+  {id:'prego',cat:'fixacao',sub:'Pregos',name:'Prego com cabeça 17x27',brand:'Fixação',sku:'PR-1727',unit:'kg',stock:300,
+    vars:[{l:'17x27',p:18.90},{l:'18x30',p:18.50}],specs:[['Bitola','17 (3,0 mm)'],['Comprimento','27 linhas (62 mm)'],['Venda','por kg']]},
+  {id:'disco',cat:'abrasivos',sub:'Discos de corte',name:'Disco de corte inox 4.1/2" x 1,0 mm',brand:'Abrasivo',sku:'DC-115-10',unit:'un',stock:400,top:true,tag:'Leve 25',
+    vars:[{l:'Unidade',p:4.90},{l:'Pacote com 25',s:'R$ 4,36 cada',p:109.00}],specs:[['Diâmetro','115 mm'],['Espessura','1,0 mm'],['Furo','22,23 mm'],['Rotação máx.','13.300 rpm']]},
+  {id:'mascara',cat:'epi',sub:'Proteção facial',name:'Máscara de solda automática tonalidade 9–13',brand:'EPI',sku:'EP-MSA913',unit:'un',stock:12,
+    vars:[{l:'Padrão',p:189.00}],specs:[['Escurecimento','1/25.000 s'],['Tonalidade','DIN 9 a 13'],['CA','com certificado de aprovação']]},
+  {id:'luva',cat:'epi',sub:'Luvas',name:'Luva de raspa cano longo para soldador',brand:'EPI',sku:'EP-LRCL',unit:'par',stock:80,
+    vars:[{l:'Tamanho único',p:21.90}],specs:[['Material','raspa de couro'],['Cano','longo (34 cm)']]},
+  {id:'dobradica',cat:'ferragens',sub:'Dobradiças',name:'Dobradiça para portão soldável 3"',brand:'Ferragem',sku:'FG-DOB3',unit:'par',stock:40,
+    vars:[{l:'3"',p:16.90},{l:'4"',p:22.90}],specs:[['Material','aço carbono'],['Uso','portões e grades']]},
+  {id:'chave',cat:'manuais',sub:'Chaves',name:'Jogo de chaves combinadas 6 a 22 mm, 12 peças',brand:'Ferramenta manual',sku:'FM-CC12',unit:'jogo',stock:7,
+    vars:[{l:'12 peças',p:149.00}],specs:[['Material','cromo-vanádio'],['Medidas','6 a 22 mm']]}
+];
+const byId = id => P.find(p=>p.id===id);
+const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+const JUMPS = [
+  {id:'home',t:'Início',d:'Ofertas e categorias'},{id:'search',t:'Busca',d:'Por nome, código ou medida'},
+  {id:'cat',t:'Categoria',d:'Soldagem com filtros'},{id:'prod',t:'Produto',d:'Gás C25: recarga ou cilindro'},
+  {id:'cart',t:'Carrinho',d:'Quantidades e totais'},{id:'checkout',t:'Entrega e pagamento',d:'Moto, caminhonete ou retirada'},
+  {id:'pix',t:'Pagamento Pix',d:'QR Code e copia e cola'},{id:'track',t:'Acompanhar pedido',d:'Mapa, etapas e entregador'}
+];
+const DEFAULT_CART = () => [{id:'e6013',v:0,q:5},{id:'disco',v:1,q:1},{id:'m8',v:1,q:2}];
+const S = {screen:'home',hist:[],cat:'solda',sub:'Todos',q:'',prod:'c25',variant:0,qty:1,cart:DEFAULT_CART(),ship:'moto',pay:'pix',cnpj:false,orderNo:'4821'};
+
+const view=document.getElementById('view'), tabEl=document.getElementById('tabbar'), sheet=document.getElementById('sheet');
+const lineTotal = c => byId(c.id).vars[c.v].p*c.q;
+const cartQty = () => S.cart.reduce((a,c)=>a+c.q,0);
+const hasGas = () => S.cart.some(c=>byId(c.id).gas);
+function totals(){const sub=S.cart.reduce((a,c)=>a+lineTotal(c),0),fee={moto:14.90,truck:39.90,pickup:0}[S.ship],disc=S.pay==='pix'?sub*.05:0;return {sub,fee,disc,total:sub+fee-disc}}
+
+function thumb(p,extra=''){const c=CATS.find(c=>c.id===p.cat);return `<div class="thumb">${svg(c.icon,1.5)}${extra}<span class="sku">${p.sku}</span></div>`}
+function card(p){const v=p.vars[0];return `<button class="pcard" data-p="${p.id}">${thumb(p,(p.tag?`<span class="tag">${p.tag}</span>`:'')+'<span class="plus">+</span>')}<div class="pbody"><div class="pname">${p.name}</div><div class="price">${brl(v.p)} <span class="unit">/${p.unit}</span></div><div class="pix">${brl(v.p*.95)} no Pix</div></div></button>`}
+function top(title,{back=true,right=''}={}){return `<div class="topbar"><div class="c">${back?`<button class="ib" data-back aria-label="Voltar">${svg('back',2.2)}</button>`:''}<h2>${title}</h2>${right}</div></div>`}
+
+const R = {
+  home(){
+    return `<header class="hero"><div class="c">
+      <div class="hrow"><div class="logo"><i></i>Elvis</div><button class="addr">${svg('pin')}<span>Rua das Indústrias, 450</span></button></div>
+      <h1 class="hello">O que a obra precisa <em>hoje</em>?</h1>
+      <button class="sfake" data-go="search">${svg('search',2)}Eletrodo, disco, M8, Makita…</button></div></header>
+    <div class="promos">
+      <button class="promo a" data-go="cart"><b>Na obra em até 3 horas</b><span>Entrega de moto para pedidos até 15 kg</span>${svg('moto',1.4)}</button>
+      <button class="promo b" data-p="c25"><b>Recarga de C25 por R$ 289</b><span>Troca do casco com entrega agendada</span>${svg('cyl',1.4)}</button>
+      <button class="promo c2" data-cat="eletricas"><b>Makita em 10x sem juros</b><span>Parafusadeiras, esmerilhadeiras e furadeiras</span>${svg('drill',1.4)}</button>
+    </div>
+    <div class="c">
+      <section class="sec"><div class="sec-h"><h3>Categorias</h3></div>
+        <div class="cats">${CATS.map(c=>`<button class="cat" data-cat="${c.id}"><span class="ico">${svg(c.icon,1.6)}</span>${c.name}</button>`).join('')}</div></section>
+      <section class="sec"><div class="sec-h"><h3>Mais vendidos</h3><button class="link" data-cat="solda">Ver tudo</button></div>
+        <div class="hscroll">${P.filter(p=>p.top).map(card).join('')}</div></section>
+      <section class="sec"><div class="sec-h"><h3>Compre de novo</h3><span class="unit">do seu último pedido</span></div>
+        <div class="grid">${['e6013','disco','luva','rebite'].map(id=>card(byId(id))).join('')}</div></section>
+    </div>`;
+  },
+  search(){
+    return `<div class="topbar"><div class="c"><label class="sbox">${svg('search',2)}<input id="q" type="search" placeholder="Buscar produto, código ou medida" value="${S.q.replace(/"/g,'&quot;')}" autocomplete="off"></label></div></div>
+    <div class="c" id="sres">${searchBody()}</div>`;
+  },
+  _sb(){
+    const q=norm(S.q.trim());
+    const res=q?P.filter(p=>norm(p.name+' '+p.sku+' '+p.vars.map(v=>v.l).join(' ')+' '+p.sub).includes(q)):[];
+    return `${!q?`<section class="sec"><div class="sec-h"><h3>Buscas frequentes</h3></div>
+      <div class="chips" style="flex-wrap:wrap;padding:0">${['6013','disco 4.1/2','M8','rebite','Makita','C25','luva'].map(s=>`<button class="chip" data-qs="${s}">${s}</button>`).join('')}</div></section>
+      <section class="sec"><div class="sec-h"><h3>Categorias</h3></div><div class="cats">${CATS.map(c=>`<button class="cat" data-cat="${c.id}"><span class="ico">${svg(c.icon,1.6)}</span>${c.name}</button>`).join('')}</div></section>`
+      :`<section class="sec" id="results"><div class="unit">${res.length} ${res.length===1?'resultado':'resultados'} para “${S.q.trim()}”</div>${res.length?`<div class="grid">${res.map(card).join('')}</div>`:`<div class="empty">${svg('search',1.5)}Nada encontrado. Tente pelo código ou pela medida.</div>`}</section>`}`;
+  },
+  cat(){
+    const c=CATS.find(x=>x.id===S.cat), items=P.filter(p=>p.cat===S.cat), subs=['Todos',...new Set(items.map(p=>p.sub))];
+    const shown=S.sub==='Todos'?items:items.filter(p=>p.sub===S.sub);
+    return top(c.name,{right:`<button class="ib" data-go="search" aria-label="Buscar">${svg('search',2)}</button>`})+
+    `<div class="c"><div class="chips">${subs.map(s=>`<button class="chip" data-sub="${s}" aria-pressed="${s===S.sub}">${s}</button>`).join('')}</div>
+    <section class="sec"><div class="unit">${shown.length} ${shown.length===1?'produto':'produtos'} · entrega hoje</div><div class="grid">${shown.map(card).join('')}</div></section></div>`;
+  },
+  prod(){
+    const p=byId(S.prod), v=p.vars[S.variant], c=CATS.find(c=>c.id===p.cat);
+    return `<div class="pd-hero"><div class="float"><button class="ib" data-back aria-label="Voltar">${svg('back',2.2)}</button><button class="ib" aria-label="Favoritar">${svg('heart',2)}</button></div>
+      <div class="art">${svg(c.icon,1.3)}</div></div>
+    <div class="pd"><div class="c">
+      <div><div class="brand">${p.brand} · ${p.sku}</div><h1>${p.name}</h1></div>
+      <div><div class="bigprice">${brl(v.p)} <span class="unit">/${p.unit}</span></div>
+        <div class="pix" style="margin-top:6px">${brl(v.p*.95)} no Pix · ou 10x de ${brl(v.p/10)}</div></div>
+      ${p.vars.length>1?`<div style="display:flex;flex-direction:column;gap:10px"><div class="lbl">${p.gas?'Como você quer o gás':'Escolha a opção'}</div>
+        <div class="opts">${p.vars.map((x,i)=>`<button class="opt" data-var="${i}" aria-pressed="${i===S.variant}">${x.l}${x.s?`<small>${x.s}</small>`:''}<em>${brl(x.p)}</em></button>`).join('')}</div></div>`:''}
+      ${p.gas?`<div class="note warn">${svg('truck',2)}<span>Na recarga, o entregador leva o cilindro cheio e recolhe o seu vazio. Cilindros vão só de caminhonete, com entrega agendada.</span></div>`:''}
+      <div class="note ok">${svg('check',2.4)}<span>${p.stock} ${p.unit==='kg'?'kg':'em estoque'} na loja · retire hoje ou receba ${p.gas?'amanhã':'em até 3 h'}</span></div>
+      <div style="display:flex;flex-direction:column;gap:10px"><div class="lbl">Ficha técnica</div>
+        <table class="specs">${p.specs.map(s=>`<tr><td>${s[0]}</td><td>${s[1]}</td></tr>`).join('')}</table></div>
+    </div></div>
+    <div class="actionbar"><div class="c"><div class="stepper"><button data-qty="-1" aria-label="Menos">−</button><span>${S.qty}</span><button data-qty="1" aria-label="Mais">+</button></div>
+      <button class="cta" data-add>Adicionar · ${brl(v.p*S.qty)}</button></div></div>`;
+  },
+  cart(){
+    if(!S.cart.length) return `<div class="c"><h1 class="big-title">Carrinho</h1><div class="empty">${svg('cart',1.5)}Seu carrinho está vazio.<button class="cta" style="flex:none;padding:0 24px" data-tab="home">Ver produtos</button></div></div>`;
+    const t=totals();
+    return `<div class="c narrow"><h1 class="big-title">Carrinho</h1><section class="sec">
+      <div class="list">${S.cart.map((c,i)=>{const p=byId(c.id),v=p.vars[c.v];return `<div class="li">${thumb(p)}<div style="min-width:0">
+        <div class="li-top">${p.name}</div><div class="li-var">${v.l} · ${brl(v.p)}/${p.unit}</div>
+        <div class="li-bot"><div class="stepper sm"><button data-cq="${i}" data-d="-1" aria-label="Menos">−</button><span>${c.q}</span><button data-cq="${i}" data-d="1" aria-label="Mais">+</button></div>
+        <b class="price">${brl(lineTotal(c))}</b></div></div></div>`}).join('')}</div>
+      ${hasGas()?`<div class="note warn">${svg('truck',2)}<span>Seu pedido tem cilindro: a entrega será de caminhonete, agendada.</span></div>`:''}
+      <div class="sum"><div class="r"><span>Produtos (${cartQty()})</span><span>${brl(t.sub)}</span></div>
+        <div class="r disc"><span>Pagando no Pix</span><span>−${brl(t.sub*.05)}</span></div>
+        <div class="r tot"><span>Subtotal</span><span>${brl(t.sub)}</span></div></div>
+      <button class="cta" data-go="checkout">Escolher entrega e pagamento</button></section></div>`;
+  },
+  checkout(){
+    if(hasGas()&&S.ship==='moto') S.ship='truck';
+    const t=totals(), gas=hasGas();
+    const ship=[
+      {id:'moto',i:'moto',b:'Moto · hoje em até 3 h',s:gas?'Indisponível: o pedido tem cilindro':'Até 15 kg · seg. a sáb., 7h às 17h',a:14.90,dis:gas},
+      {id:'truck',i:'truck',b:'Caminhonete · agendada',s:'Amanhã, 8h às 12h · cilindros e peso',a:39.90},
+      {id:'pickup',i:'store',b:'Retirar no balcão',s:'Pronto em 30 min · Av. Brasil, 1200',a:0}];
+    const pay=[
+      {id:'pix',i:'pixi',b:'Pix',s:'5% de desconto · aprovação na hora',a:'−'+brl(t.sub*.05)},
+      {id:'card',i:'card',b:'Cartão de crédito',s:'Até 10x sem juros de '+brl((t.sub+t.fee)/10),a:''},
+      {id:'boleto',i:'barcode',b:'Boleto',s:'Vence em 3 dias úteis',a:''}];
+    return top('Entrega e pagamento')+`<div class="c narrow"><section class="sec">
+      <div class="lbl">Como receber</div>
+      <div class="choices">${ship.map(o=>`<button class="choice" role="radio" data-ship="${o.id}" aria-checked="${S.ship===o.id}" aria-disabled="${!!o.dis}"><span class="ci">${svg(o.i)}</span><span><b>${o.b}</b><small>${o.s}</small></span><span class="amt">${o.a?brl(o.a):'Grátis'}</span></button>`).join('')}</div>
+      ${S.ship!=='pickup'?`<div class="card"><div class="k">Endereço de entrega</div>Rua das Indústrias, 450, galpão 3 · Distrito Industrial<div class="unit">Recebe: Marcos · (11) 9 8765-4321</div></div>`:''}
+      <div class="lbl" style="margin-top:8px">Como pagar</div>
+      <div class="choices">${pay.map(o=>`<button class="choice" role="radio" data-pay="${o.id}" aria-checked="${S.pay===o.id}"><span class="ci">${svg(o.i)}</span><span><b>${o.b}</b><small>${o.s}</small></span><span class="amt" style="color:var(--ok)">${o.a}</span></button>`).join('')}</div>
+      <div class="card trow"><div><div class="k">Nota fiscal</div>${S.cnpj?'CNPJ 12.345.678/0001-90 · Serralheria Silva':'CPF 123.456.789-00'}<div class="unit">Comprar como empresa</div></div>
+        <button class="switch" role="switch" aria-label="Comprar com CNPJ" aria-checked="${S.cnpj}" data-cnpj></button></div>
+      <div class="sum"><div class="r"><span>Produtos</span><span>${brl(t.sub)}</span></div>
+        <div class="r"><span>Entrega</span><span>${t.fee?brl(t.fee):'Grátis'}</span></div>
+        ${t.disc?`<div class="r disc"><span>Desconto Pix</span><span>−${brl(t.disc)}</span></div>`:''}
+        <div class="r tot"><span>Total</span><span>${brl(t.total)}</span></div></div></section></div>
+    <div class="actionbar"><div class="c"><button class="cta" data-place>${S.pay==='pix'?'Gerar Pix':S.pay==='card'?'Pagar com cartão':'Gerar boleto'} · ${brl(t.total)}</button></div></div>`;
+  },
+  pix(){
+    const t=totals();
+    return top('Pagamento Pix')+`<div class="c narrow"><section class="sec"><div class="pixbox">
+      <span class="timer">Pague em <span id="timer">14:59</span></span>
+      <div class="qrw"><canvas id="qr" width="29" height="29" aria-label="QR Code Pix de exemplo"></canvas></div>
+      <div><div class="unit">Pedido #${S.orderNo}</div><div class="bigprice">${brl(t.total)}</div></div>
+      <div class="code" id="pixcode">00020126580014BR.GOV.BCB.PIX0136exemplo-elvis-${S.orderNo}52040000530398654${t.total.toFixed(2)}5802BR5913ELVIS EXEMPLO6009SAO PAULO6304A1B2</div>
+      <button class="cta ghost" data-copy style="width:100%;flex:none">Copiar código Pix</button>
+      <div class="unit">Abra o app do banco, escolha Pix e leia o QR Code ou cole o código.</div></div></section></div>
+    <div class="actionbar"><div class="c"><button class="cta dark" data-go="track">Simular pagamento aprovado</button></div></div>`;
+  },
+  track(){
+    const steps=[['Pedido recebido','Hoje, 14:02',1],['Pagamento aprovado','Pix · 14:04',1],['Separado no estoque','Conferido por Jéssica · 14:21',1],['Saiu para entrega','Moto · 14:38','now'],['Entregue','Previsto até 15:10',0]];
+    return top('Pedido #'+S.orderNo,{back:false,right:'<span class="pill go">A caminho</span>'})+
+    `<div class="map"><svg viewBox="0 0 400 240" preserveAspectRatio="xMidYMid slice" fill="none">
+      <path d="M40 200 C 120 200, 110 110, 200 110 S 300 60, 360 56" stroke="var(--steel)" stroke-width="5" stroke-dasharray="2 11" stroke-linecap="round"/>
+      <rect x="28" y="188" width="24" height="24" rx="7" fill="var(--steel)"/>
+      <circle cx="360" cy="56" r="13" fill="var(--ok)"/><circle cx="360" cy="56" r="5" fill="var(--surface)"/>
+      <circle cx="232" cy="100" r="20" fill="var(--spark)" opacity=".3"/><circle cx="232" cy="100" r="12" fill="var(--spark)"/></svg></div>
+    <div class="c narrow"><div class="eta"><div class="card"><div><span class="unit">Chega em cerca de</span><b>18 min</b></div><div class="unit" style="text-align:right">Rua das Indústrias, 450<br>galpão 3</div></div></div>
+    <section class="sec"><ol class="steps">${steps.map(s=>`<li class="${s[2]===1?'done':s[2]==='now'?'now':''}"><span class="dot">${s[2]===1?svg('check',3):''}</span><span><b>${s[0]}</b><small>${s[1]}</small></span></li>`).join('')}</ol>
+    <div class="card driver"><div class="avatar">R</div><div style="flex:1;min-width:0"><b>Rogério</b><div class="unit">Moto · placa ABC-1D23</div></div><button class="ib" aria-label="Mensagem">${svg('chat',2)}</button></div>
+    <div class="note ok">${svg('check',2.4)}<span>Na entrega, confira os itens e informe o código <b>7314</b> ao entregador.</span></div></section></div>`;
+  },
+  orders(){
+    return `<div class="c narrow"><h1 class="big-title">Pedidos</h1><section class="sec">
+      <button class="orow" data-go="track"><span><b>#${S.orderNo}</b> · hoje<br><span class="unit">3 itens · moto</span></span><span class="pill go">A caminho</span></button>
+      <button class="orow"><span><b>#4710</b> · 08/10<br><span class="unit">Recarga C25 · caminhonete</span></span><span class="pill okp">Entregue</span></button>
+      <button class="orow"><span><b>#4655</b> · 29/09<br><span class="unit">12 itens · retirada</span></span><span class="pill okp">Retirado</span></button></section></div>`;
+  },
+  account(){
+    return `<div class="c narrow"><h1 class="big-title">Conta</h1><section class="sec">
+      <div class="profile"><div class="avatar">S</div><div><b style="font:700 18px var(--f-display)">Serralheria Silva</b><div class="unit">Cliente desde 2023 · 14 pedidos</div></div></div>
+      <div class="menu">
+        <button>${svg('pin')}<span>Endereços</span><small>2</small>${svg('chev',2)}</button>
+        <button>${svg('building')}<span>Dados da empresa (CNPJ)</span>${svg('chev',2)}</button>
+        <button>${svg('card')}<span>Cartões salvos</span><small>1</small>${svg('chev',2)}</button>
+        <button>${svg('heart')}<span>Listas por obra</span><small>3</small>${svg('chev',2)}</button>
+        <button>${svg('chat')}<span>Falar com a loja</span>${svg('chev',2)}</button></div>
+      <div class="menu"><button data-open-sheet>${svg('info')}<span>Sobre este esboço<br><small>Funcionalidades, stack e próximos passos</small></span>${svg('chev',2)}</button></div>
+    </section></div>`;
+  }
+};
+
+const searchBody=()=>R._sb();
+const TABS=[{id:'home',l:'Início',i:'home'},{id:'search',l:'Buscar',i:'search'},{id:'cart',l:'Carrinho',i:'cart'},{id:'orders',l:'Pedidos',i:'box'},{id:'account',l:'Conta',i:'user'}];
+const NO_TABS=['prod','checkout','pix'];
+const tabOf=s=>({home:'home',search:'search',cat:'search',cart:'cart',orders:'orders',track:'orders',account:'account'})[s];
+
+let timerId;
+function render(scrollTop=true){
+  view.innerHTML=R[S.screen]();
+  view.className=NO_TABS.includes(S.screen)?'has-bar':'';
+  tabEl.hidden=NO_TABS.includes(S.screen);
+  const cur=tabOf(S.screen);
+  tabEl.innerHTML=TABS.map(t=>`<button class="tab" data-tab="${t.id}" aria-current="${t.id===cur}">${svg(t.i,2)}${t.l}${t.id==='cart'&&S.cart.length?`<span class="badge">${cartQty()}</span>`:''}</button>`).join('');
+  document.getElementById('jumps').innerHTML=JUMPS.map(j=>`<li><button data-jump="${j.id}"><b>${j.t}</b><small>${j.d}</small></button></li>`).join('');
+  if(scrollTop) window.scrollTo(0,0);
+  clearInterval(timerId);
+  if(S.screen==='pix'){drawQR();let s=899;timerId=setInterval(()=>{const el=document.getElementById('timer');if(!el){clearInterval(timerId);return}s=Math.max(0,s-1);el.textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')},1000)}
+  const q=document.getElementById('q');
+  if(q){q.addEventListener('input',()=>{S.q=q.value;document.getElementById('sres').innerHTML=searchBody()});}
+}
+function toast(msg){const d=document.createElement('div');d.className='toast';d.innerHTML=svg('check',3)+msg;document.body.appendChild(d);setTimeout(()=>d.remove(),1800)}
+function drawQR(){
+  const c=document.getElementById('qr'); if(!c) return; const x=c.getContext('2d'), n=29;
+  x.fillStyle='#fff';x.fillRect(0,0,n,n);x.fillStyle='#111';
+  let seed=Number(S.orderNo); const rnd=()=>{seed=(seed*9301+49297)%233280;return seed/233280};
+  const finder=(a,b)=>(a<8&&b<8)||(a>=n-8&&b<8)||(a<8&&b>=n-8);
+  for(let i=0;i<n;i++)for(let j=0;j<n;j++){if(!finder(i,j)&&rnd()>.52) x.fillRect(i,j,1,1)}
+  [[0,0],[n-7,0],[0,n-7]].forEach(([a,b])=>{x.fillRect(a,b,7,7);x.fillStyle='#fff';x.fillRect(a+1,b+1,5,5);x.fillStyle='#111';x.fillRect(a+2,b+2,3,3)});
+}
+function go(screen){ if(S.screen!==screen) S.hist.push(S.screen); S.screen=screen; render(); }
+function jump(id){
+  sheet.hidden=true; S.hist=[];
+  if(['cart','checkout','pix','track'].includes(id)&&!S.cart.length) S.cart=DEFAULT_CART();
+  if(id==='cat'){S.cat='solda';S.sub='Todos';S.hist=['home']}
+  if(id==='prod'){S.prod='c25';S.variant=0;S.qty=1;S.hist=['home']}
+  if(id==='checkout') S.hist=['cart'];
+  if(id==='pix'){S.pay='pix';S.hist=['cart','checkout']}
+  S.screen=id; render();
+}
+
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  const d=b.dataset;
+  if('jump' in d) return jump(d.jump);
+  if('openSheet' in d){ sheet.hidden=false; sheet.scrollTop=0; return; }
+  if('closeSheet' in d){ sheet.hidden=true; return; }
+  if('tab' in d){ S.hist=[]; S.screen=d.tab; return render(); }
+  if('back' in d){ S.screen=S.hist.pop()||'home'; return render(); }
+  if('cat' in d){ S.cat=d.cat; S.sub='Todos'; return go('cat'); }
+  if('sub' in d){ S.sub=d.sub; return render(false); }
+  if('qs' in d){ S.q=d.qs; return render(false); }
+  if('p' in d){ S.prod=d.p; S.variant=0; S.qty=1; return go('prod'); }
+  if('var' in d){ S.variant=+d.var; return render(false); }
+  if('qty' in d){ S.qty=Math.max(1,S.qty+ +d.qty); return render(false); }
+  if('add' in d){ const ex=S.cart.find(c=>c.id===S.prod&&c.v===S.variant); ex?ex.q+=S.qty:S.cart.push({id:S.prod,v:S.variant,q:S.qty}); toast('Adicionado ao carrinho'); S.screen=S.hist.pop()||'home'; return render(); }
+  if('cq' in d){ const c=S.cart[+d.cq]; c.q+= +d.d; if(c.q<1) S.cart.splice(+d.cq,1); return render(false); }
+  if('ship' in d){ if(d.ship==='moto'&&hasGas()) return; S.ship=d.ship; return render(false); }
+  if('pay' in d){ S.pay=d.pay; return render(false); }
+  if('cnpj' in d){ S.cnpj=!S.cnpj; return render(false); }
+  if('place' in d){ if(S.pay==='pix') return go('pix'); toast(S.pay==='card'?'Pagamento aprovado':'Boleto gerado'); S.hist=[]; S.screen='track'; return render(); }
+  if('copy' in d){ const code=document.getElementById('pixcode').textContent;
+    try{ navigator.clipboard.writeText(code).then(()=>toast('Código copiado'),selectCode) }catch(_){ selectCode() } return; }
+  if(d.go){ if(d.go==='track'){S.hist=[];S.screen='track';return render()} return go(d.go); }
+});
+function selectCode(){const el=document.getElementById('pixcode');const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r)}
+render();
+})();
+</script>
+
+</body>
+</html>
