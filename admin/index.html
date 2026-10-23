@@ -48,7 +48,7 @@ svg.i{width:20px;height:20px;flex:none}
 .topbar .lg svg{height:30px;width:auto;display:block}
 .topbar .t{flex:1;font-weight:600;font-size:15px;color:#C9D7E6;text-align:right}
 main{padding:18px var(--gr) calc(110px + var(--sb)) var(--gl);max-width:1200px}
-.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--card);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);padding-bottom:var(--sb)}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--card);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:var(--sb)}
 .tabs button{background:none;border:0;padding:10px 0 12px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer}
 .tabs button[aria-current="true"]{color:var(--navy-2)}
 @media (prefers-color-scheme:dark){.tabs button[aria-current="true"]{color:var(--blue)}}
@@ -218,8 +218,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 <div id="layer"></div>
 <input type="file" id="csvfile" accept=".csv,text/csv" hidden>
 <input type="file" id="photofile" accept="image/*" hidden>
+<input type="file" id="nffile" hidden>
 
-<script src="../data/store.js?v=9"></script>
+<script src="../data/store.js?v=10"></script>
 <script>
 (function(){
 const D = window.DBCStore;
@@ -253,27 +254,31 @@ const UNITS = ['un','kg','cento','caixa','rolo','cilindro','par','jogo','metro',
 const SHIP_L={moto:'Moto',truck:'Caminhonete agendada',pickup:'Retirada na loja'};
 const PAY_L={pix:'Pix',card:'Cartão de crédito',boleto:'Boleto'};
 
-const S = {tab:'products', q:'', cat:'all', ofilter:'open', layer:null, edit:null, delAsk:false, err:'', order:null, csvMsg:null, resetAsk:false};
+const S = {tab:'products', q:'', cat:'all', ofilter:'open', layer:null, edit:null, delAsk:false, err:'', order:null, csvMsg:null, resetAsk:false, per:'30', from:'', to:'', rfilter:'open', nfilter:'all', rf:null, ret:null, inv:null, attachKind:null};
 
 function toast(m){const d=document.createElement('div');d.className='toast';d.innerHTML=svg('check',3)+esc(m);document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
 function thumb(p){return `<span class="thumb">${p.photo?`<img src="${p.photo}" alt="">`:svg(p.cat,1.6)}</span>`}
 function prodAny(id){return D.allProducts().find(p=>p.id===id)||{name:'Produto removido',sku:'—',unit:'un',vars:[{l:'—',p:0}]}}
-function oTot(o){const sub=o.items.reduce((a,[id,v,q])=>{const p=prodAny(id);return a+(p.vars[v]||p.vars[0]).p*q},0),fee={moto:14.9,truck:39.9,pickup:0}[o.ship],disc=o.pay==='pix'?sub*.05:0;return {sub,fee,disc,total:sub+fee-disc}}
+function oTot(o){return D.totals(o)}
+function oTotOld(o){const sub=o.items.reduce((a,[id,v,q])=>{const p=prodAny(id);return a+(p.vars[v]||p.vars[0]).p*q},0),fee={moto:14.9,truck:39.9,pickup:0}[o.ship],disc=o.pay==='pix'?sub*.05:0;return {sub,fee,disc,total:sub+fee-disc}}
 function stCls(o){return o.status===-1?'sx':'s'+o.status}
 function fmt(iso){const d=new Date(iso);return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' às '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
 
-const NAV=[{id:'products',l:'Produtos',i:'box'},{id:'orders',l:'Pedidos',i:'list'},{id:'data',l:'Planilha e dados',s:'Dados',i:'sheet'}];
+I.money='<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 9v.01M18 15v.01"/>';I.ret='<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>';I.doc='<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/>';I.dots='<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>';
+const NAV=[{id:'products',l:'Produtos',i:'box'},{id:'orders',l:'Pedidos',i:'list'},{id:'finance',l:'Financeiro',i:'money'},{id:'returns',l:'Devoluções',i:'ret'},{id:'invoices',l:'Notas fiscais',i:'doc'},{id:'data',l:'Planilha e dados',s:'Dados',i:'sheet'},{id:'more',l:'Mais',i:'dots',mob:1}];
+const MOB=['products','orders','finance','more'];
 function chrome(){
   const open=D.orders().filter(o=>o.status>=0&&o.status<4).length;
   $('side').innerHTML=`<div class="lg">${LOCKUP}</div>
-    ${NAV.map(n=>`<button data-tab="${n.id}" aria-current="${S.tab===n.id}">${svg(n.i)}${n.l}${n.id==='orders'&&open?` <span class="tag star" style="margin-left:auto">${open}</span>`:''}</button>`).join('')}
+    ${NAV.filter(n=>!n.mob).map(n=>`<button data-tab="${n.id}" aria-current="${S.tab===n.id}">${svg(n.i)}${n.l}${n.id==='orders'&&open?` <span class="tag star" style="margin-left:auto">${open}</span>`:''}</button>`).join('')}
     <div class="lbl">Ver no app</div>
     <a href="../" target="_blank" rel="noopener">${svg('ext')}App versão 1</a>
     <a href="../v2/" target="_blank" rel="noopener">${svg('ext')}App versão 2</a>
     <div class="foot">Dados salvos neste navegador. Para valer em todos os celulares, o próximo passo é ligar o Firebase.</div>`;
   $('tlogo').innerHTML=LOCKUP;
   $('ttitle').textContent='Painel · '+NAV.find(n=>n.id===S.tab).l;
-  $('tabs').innerHTML=NAV.map(n=>`<button data-tab="${n.id}" aria-current="${S.tab===n.id}">${svg(n.i)}${n.s||n.l}</button>`).join('');
+  const mcur=MOB.includes(S.tab)?S.tab:'more';
+  $('tabs').innerHTML=MOB.map(id=>NAV.find(n=>n.id===id)).map(n=>`<button data-tab="${n.id}" aria-current="${mcur===n.id}">${svg(n.i)}${n.s||n.l}</button>`).join('');
 }
 
 const V = {
@@ -318,6 +323,167 @@ const V = {
     </div>`;
   }
 };
+
+// ---------- período ----------
+const PER=[['today','Hoje'],['7','7 dias'],['30','30 dias'],['month','Este mês'],['all','Tudo']];
+function range(){const n=new Date(),e=new Date(n);e.setHours(23,59,59,999);let s=new Date(n);s.setHours(0,0,0,0);
+  if(S.per==='7')s.setDate(s.getDate()-6);else if(S.per==='30')s.setDate(s.getDate()-29);else if(S.per==='month')s.setDate(1);else if(S.per==='all')s=new Date(2000,0,1);
+  if(S.per==='custom'&&S.from&&S.to){s=new Date(S.from+'T00:00:00');const t=new Date(S.to+'T23:59:59');return [s,t]}return [s,e]}
+const inR=(iso,[a,b])=>{if(!iso)return false;const d=new Date(iso);return d>=a&&d<=b};
+function perBar(){return `<div class="filters">${PER.map(([k,l])=>`<button class="chip" data-per="${k}" aria-pressed="${S.per===k}">${l}</button>`).join('')}<button class="chip" data-per="custom" aria-pressed="${S.per==='custom'}">Escolher datas</button></div>
+  ${S.per==='custom'?`<div class="tools"><input class="f" type="date" id="pf" value="${S.from||''}" aria-label="De" style="width:auto"><input class="f" type="date" id="pt" value="${S.to||''}" aria-label="Até" style="width:auto"></div>`:''}`}
+function dl(name,data,type){const blob=data instanceof Blob?data:(typeof data==='string'&&data.startsWith('data:')?null:new Blob([data],{type:type||'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=blob?URL.createObjectURL(blob):data;a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{if(blob)URL.revokeObjectURL(a.href);a.remove()},800)}
+const csvq=v=>{v=v==null?'':String(v);return /[";\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+const num=n=>(Math.round(n*100)/100).toFixed(2).replace('.',',');
+const RS=D.RETURN_STATUS, RL={pix:'Pix',card:'Estorno no cartão',boleto:'Transferência bancária',credito:'Crédito na loja'};
+const REASONS=['Produto com defeito','Produto errado ou trocado','Avaria no transporte','Cliente desistiu','Outro motivo'];
+const rCls=r=>({solicitada:'s0',aprovada:'s1',recebida:'s3',reembolsada:'s4',recusada:'sx'})[r.status];
+const nCls=n=>({pendente:'s3',emitida:'s4',cancelada:'sx'})[n.status];
+const nLabel=n=>({pendente:'Pendente',emitida:'Emitida',cancelada:'Cancelada'})[n.status];
+const nType=n=>n.type==='devolucao'?'Devolução':'Venda';
+
+function finCalc(){
+  const rg=range(), sales=D.orders().filter(o=>o.status>=1&&inR(o.history[1]||o.created,rg));
+  const rows=sales.map(o=>{const t=D.totals(o);return {o,t,fee:D.fee(o.pay,t.total),when:o.history[1]||o.created}});
+  const refunds=D.returns().filter(r=>r.status==='reembolsada'&&inR(r.history.reembolsada,rg));
+  const open=D.returns().filter(r=>['solicitada','aprovada','recebida'].includes(r.status));
+  const gross=rows.reduce((a,x)=>a+x.t.total,0), fees=rows.reduce((a,x)=>a+x.fee,0), ref=refunds.reduce((a,r)=>a+r.amount,0);
+  return {rg,rows,refunds,open,gross,fees,ref,net:gross-fees-ref,count:rows.length,ticket:rows.length?gross/rows.length:0,toRefund:open.reduce((a,r)=>a+r.amount,0)};
+}
+function chart(F){
+  const [a,b]=F.rg, span=(Math.min(b,new Date())-Math.max(a,new Date(Date.now()-366*864e5)))/864e5;
+  const byMonth=S.per==='all'||span>62, buckets=[], key=d=>byMonth?d.getFullYear()+'-'+d.getMonth():d.toDateString();
+  let start=S.per==='all'?(F.rows.length?new Date(Math.min(...F.rows.map(x=>new Date(x.when)))):new Date()):new Date(a), end=new Date(Math.min(b,new Date()));
+  if(byMonth){start=new Date(start.getFullYear(),start.getMonth(),1);for(let d=new Date(start);d<=end&&buckets.length<24;d.setMonth(d.getMonth()+1))buckets.push({k:key(d),l:d.toLocaleDateString('pt-BR',{month:'short'}).replace('.',''),v:0,r:0})}
+  else{start.setHours(0,0,0,0);for(let d=new Date(start);d<=end&&buckets.length<62;d.setDate(d.getDate()+1))buckets.push({k:key(d),l:String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0'),v:0,r:0})}
+  F.rows.forEach(x=>{const k=buckets.find(q=>q.k===key(new Date(x.when)));if(k)k.v+=x.t.total});
+  F.refunds.forEach(r=>{const k=buckets.find(q=>q.k===key(new Date(r.history.reembolsada)));if(k)k.r+=r.amount});
+  if(!buckets.length)return '';
+  const W=640,H=200,pl=8,pb=24,pt=18,max=Math.max(1,...buckets.map(q=>q.v)),bw=(W-pl*2)/buckets.length, every=Math.ceil(buckets.length/8);
+  const y=v=>H-pb-(v/max)*(H-pb-pt);
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" role="img" aria-label="Vendas por ${byMonth?'mês':'dia'}">
+    <line x1="${pl}" x2="${W-pl}" y1="${H-pb}" y2="${H-pb}" stroke="var(--line)"/><line x1="${pl}" x2="${W-pl}" y1="${pt}" y2="${pt}" stroke="var(--line)" stroke-dasharray="3 4"/>
+    <text x="${W-pl}" y="${pt-5}" text-anchor="end" font-size="11" fill="var(--muted)">${brl(max)}</text>
+    ${buckets.map((q,i)=>{const x=pl+i*bw+bw*.18,w=Math.max(2,bw*.64);return `${q.v?`<rect x="${x}" y="${y(q.v)}" width="${w}" height="${H-pb-y(q.v)}" rx="3" fill="#0D4677"><title>${q.l}: ${brl(q.v)}</title></rect>`:''}${q.r?`<rect x="${x+w*.25}" y="${y(q.r)}" width="${w*.5}" height="${H-pb-y(q.r)}" rx="2" fill="#F28A26"><title>Estorno ${q.l}: ${brl(q.r)}</title></rect>`:''}${i%every===0?`<text x="${x+w/2}" y="${H-7}" text-anchor="middle" font-size="10.5" fill="var(--muted)">${q.l}</text>`:''}`}).join('')}
+  </svg><div style="display:flex;gap:14px;font-size:12.5px;color:var(--muted);margin-top:6px"><span><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#0D4677"></i> Vendas</span><span><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#F28A26"></i> Estornos</span></div>`;
+}
+Object.assign(V,{
+  finance(){
+    const F=finCalc(), st=D.settings();
+    const byPay=['pix','card','boleto'].map(k=>{const r=F.rows.filter(x=>x.o.pay===k);const g=r.reduce((a,x)=>a+x.t.total,0),f=r.reduce((a,x)=>a+x.fee,0),rf=F.refunds.filter(x=>(D.order(x.orderNo)||{}).pay===k).reduce((a,x)=>a+x.amount,0);return {k,n:r.length,g,f,rf,net:g-f-rf}});
+    const cat={};F.rows.forEach(x=>x.o.items.forEach(it=>{const p=prodAny(it[0]);const v=(it[3]!=null?it[3]:(p.vars[it[1]]||p.vars[0]).p)*it[2];cat[p.cat||'outros']=(cat[p.cat||'outros']||0)+v}));
+    const cats=Object.entries(cat).sort((a,b)=>b[1]-a[1]), ctot=cats.reduce((a,c)=>a+c[1],0)||1;
+    return `<div class="ph"><div><h1>Financeiro</h1><p>Movimentação das vendas feitas pelo app</p></div><button class="btn ghost" data-finexport>${svg('down',2)}Exportar CSV</button></div>
+    ${perBar()}
+    <div class="kpis">
+      <div class="kpi"><small>Vendas brutas</small><b>${brl(F.gross)}</b></div>
+      <div class="kpi"><small>Taxas de pagamento</small><b style="color:var(--bad)">−${brl(F.fees)}</b></div>
+      <div class="kpi"><small>Devoluções (estornos)</small><b style="color:var(--bad)">−${brl(F.ref)}</b></div>
+      <div class="kpi" style="border-color:var(--navy-2)"><small>Líquido</small><b>${brl(F.net)}</b></div>
+      <div class="kpi"><small>Pedidos pagos</small><b>${F.count}</b></div>
+      <div class="kpi"><small>Ticket médio</small><b>${brl(F.ticket)}</b></div>
+      <div class="kpi"><small>A reembolsar</small><b style="color:var(--warn)">${brl(F.toRefund)}</b></div></div>
+    <div class="box" style="margin-bottom:14px"><h3>Vendas no período</h3>${F.rows.length||F.refunds.length?chart(F):'<div class="empty">Nenhuma venda paga neste período.</div>'}</div>
+    <div class="cards">
+      <div class="box"><h3>Por forma de pagamento</h3>${byPay.map(x=>`<div class="it"><span>${PAY_L[x.k]}<small>${x.n} ${x.n===1?'pedido':'pedidos'} · taxa ${brl(x.f)}${x.rf?` · estornos ${brl(x.rf)}`:''}</small></span><b>${brl(x.net)}</b></div>`).join('')}<p style="margin:8px 0 0;font-size:12.5px;color:var(--muted)">Valores líquidos, já sem as taxas e os estornos.</p></div>
+      <div class="box"><h3>Por categoria</h3>${cats.length?cats.map(([c,v])=>`<div class="it" style="display:block"><div style="display:flex;justify-content:space-between;gap:10px"><span>${esc(catName(c))}</span><b>${brl(v)}</b></div><div style="height:6px;border-radius:3px;background:var(--soft);margin-top:6px"><div style="height:100%;width:${Math.round(v/ctot*100)}%;background:#1E95D3;border-radius:3px"></div></div></div>`).join(''):'<div class="empty">Sem vendas.</div>'}</div>
+      <div class="box"><h3>Taxas do meio de pagamento</h3><p style="margin:0 0 10px;font-size:13px;color:var(--muted)">Valores estimados do Mercado Pago. Ajuste conforme o seu contrato.</p>
+        ${['pix','card','boleto'].map(k=>`<div class="row2" style="margin-bottom:8px;align-items:center"><span style="font-weight:600">${PAY_L[k]}</span><div style="display:flex;gap:6px"><input class="f" data-feep="${k}" inputmode="decimal" value="${String(st.fees[k].pct).replace('.',',')}" aria-label="Percentual ${PAY_L[k]}" style="min-height:38px;padding:6px 8px"><span style="align-self:center">%</span><input class="f" data-feef="${k}" inputmode="decimal" value="${String(st.fees[k].fixed).replace('.',',')}" aria-label="Valor fixo ${PAY_L[k]}" style="min-height:38px;padding:6px 8px"><span style="align-self:center">R$</span></div></div>`).join('')}
+        <button class="btn sm" data-savefees>Salvar taxas</button></div>
+    </div>
+    <div class="box" style="margin-top:14px"><h3>Movimentações</h3>${finMoves(F).slice(0,40).map(m=>`<div class="it"><span>${m.t}<small>${fmt(m.d)} · pedido #${m.o}${m.x?' · '+m.x:''}</small></span><b style="color:${m.v<0?'var(--bad)':'inherit'}">${m.v<0?'−':''}${brl(Math.abs(m.v))}</b></div>`).join('')||'<div class="empty">Nada no período.</div>'}</div>`;
+  },
+  returns(){
+    const all=D.returns(), f={open:r=>['solicitada','aprovada','recebida'].includes(r.status),done:r=>r.status==='reembolsada',no:r=>r.status==='recusada',all:()=>true}[S.rfilter];
+    const list=all.filter(f);
+    return `<div class="ph"><div><h1>Devoluções</h1><p>Para registrar, abra o pedido em Pedidos e toque em "Registrar devolução"</p></div><button class="btn ghost" data-tab="orders">${svg('list')}Ir para pedidos</button></div>
+    <div class="kpis"><div class="kpi"><small>Em aberto</small><b>${all.filter(r=>['solicitada','aprovada','recebida'].includes(r.status)).length}</b></div><div class="kpi"><small>A reembolsar</small><b>${brl(all.filter(r=>['solicitada','aprovada','recebida'].includes(r.status)).reduce((a,r)=>a+r.amount,0))}</b></div><div class="kpi"><small>Já reembolsado</small><b>${brl(all.filter(r=>r.status==='reembolsada').reduce((a,r)=>a+r.amount,0))}</b></div></div>
+    <div class="filters">${[['open','Em aberto'],['done','Reembolsadas'],['no','Recusadas'],['all','Todas']].map(([k,l])=>`<button class="chip" data-rf="${k}" aria-pressed="${S.rfilter===k}">${l}</button>`).join('')}</div>
+    <div class="olist">${list.length?list.map(r=>`<button class="ocard" data-ret="${r.id}"><span><b>${r.id}</b> · pedido #${r.orderNo} · ${esc(r.customer||'')}<br><small>${fmt(r.created)} · ${esc(r.reason)} · ${RL[r.refund]||r.refund}</small></span>
+      <span style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="st ${rCls(r)}">${RS[r.status]}</span><span class="tot">${brl(r.amount)}</span></span></button>`).join(''):`<div class="empty">Nenhuma devolução aqui.</div>`}</div>`;
+  },
+  invoices(){
+    const rg=range(), all=D.invoices().filter(n=>inR(n.issued||n.created,rg)), list=all.filter(n=>S.nfilter==='all'||n.status===S.nfilter);
+    return `<div class="ph"><div><h1>Notas fiscais</h1><p>Uma nota por pedido pago e por devolução</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost" data-nfcsv>${svg('down',2)}CSV</button><button class="btn ghost" data-nfzip>${svg('down',2)}XMLs em ZIP</button></div></div>
+    <div class="notice"><b>Simulação</b>Nesta fase o painel organiza as notas e guarda os arquivos que você anexar. A emissão de verdade vai ser feita pelo emissor de NF-e (por exemplo Bling, Focus NFe ou NFE.io), ligado ao painel por API.</div>
+    ${perBar()}
+    <div class="filters">${[['all','Todas'],['pendente','Pendentes'],['emitida','Emitidas'],['cancelada','Canceladas']].map(([k,l])=>`<button class="chip" data-nf="${k}" aria-pressed="${S.nfilter===k}">${l} (${k==='all'?all.length:all.filter(n=>n.status===k).length})</button>`).join('')}</div>
+    <div class="olist">${list.length?list.map(n=>`<button class="ocard" data-inv="${n.id}"><span><b>${n.number?'NF '+n.number:'Sem número'}</b> · série ${n.series} · <span class="tag${n.type==='devolucao'?' star':''}">${nType(n)}</span><br><small>Pedido #${n.orderNo} · ${esc(n.customer)} · ${fmt(n.issued||n.created)}${n.files&&(n.files.xml||n.files.pdf)?' · anexos: '+[n.files.xml?'XML':'',n.files.pdf?'PDF':''].filter(Boolean).join(' e '):''}</small></span>
+      <span style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="st ${nCls(n)}">${nLabel(n)}</span><span class="tot">${brl(n.amount)}</span></span></button>`).join(''):`<div class="empty">Nenhuma nota neste período.</div>`}</div>`;
+  },
+  more(){
+    const ro=D.returns().filter(r=>['solicitada','aprovada','recebida'].includes(r.status)).length, np=D.invoices().filter(n=>n.status==='pendente').length;
+    return `<div class="ph"><div><h1>Mais</h1></div></div><div class="olist">
+      <button class="ocard" data-tab="returns"><span><b>Devoluções</b><br><small>Registrar e acompanhar devoluções e reembolsos</small></span><span class="st ${ro?'s3':'s0'}">${ro} em aberto</span></button>
+      <button class="ocard" data-tab="invoices"><span><b>Notas fiscais</b><br><small>Notas de venda e de devolução, XML e PDF</small></span><span class="st ${np?'s3':'s0'}">${np} pendentes</span></button>
+      <button class="ocard" data-tab="data"><span><b>Planilha e dados</b><br><small>Importar e exportar produtos, testar os apps</small></span><span></span></button></div>`;
+  }
+});
+function finMoves(F){const m=[];F.rows.forEach(x=>{m.push({d:x.when,t:'Venda · '+PAY_L[x.o.pay],o:x.o.no,v:x.t.total,x:x.o.customer});if(x.fee)m.push({d:x.when,t:'Taxa '+PAY_L[x.o.pay],o:x.o.no,v:-x.fee})});F.refunds.forEach(r=>m.push({d:r.history.reembolsada,t:'Estorno da devolução '+r.id,o:r.orderNo,v:-r.amount,x:RL[r.refund]}));return m.sort((a,b)=>b.d.localeCompare(a.d))}
+
+function retForm(){
+  const o=D.order(S.rf.orderNo), pix=o.pay==='pix';
+  const auto=o.items.reduce((a,it,i)=>a+(S.rf.q[i]||0)*(it[3]!=null?it[3]:(prodAny(it[0]).vars[it[1]]||{p:0}).p)*(pix?.95:1),0);
+  const amt=S.rf.amount!=null?S.rf.amount:Math.round(auto*100)/100;
+  return `<div class="scrim" data-close></div><section class="drawer" role="dialog" aria-modal="true" aria-label="Registrar devolução">
+    <div class="dh"><button class="x" data-back-order aria-label="Voltar">${svg('x',2)}</button><h2>Devolução do pedido #${o.no}</h2></div>
+    <div class="db">${S.err?`<div class="err">${esc(S.err)}</div>`:''}
+      <div class="fld"><span class="lab">Quais itens voltam?</span><div class="box">${o.items.map((it,i)=>{const p=prodAny(it[0]),x=p.vars[it[1]]||p.vars[0];return `<div class="it" style="align-items:center"><span>${esc(p.name)}<small>${esc(x.l)} · comprou ${it[2]} ${esc(p.unit)}</small></span>
+        <span style="display:flex;align-items:center;gap:6px"><button class="x" data-rq="${i}" data-d="-1" aria-label="Menos" style="width:34px;height:34px">−</button><b style="min-width:24px;text-align:center">${S.rf.q[i]||0}</b><button class="x" data-rq="${i}" data-d="1" aria-label="Mais" style="width:34px;height:34px">+</button></span></div>`}).join('')}
+        <button class="btn ghost sm" data-rall style="margin-top:8px">Devolver tudo</button></div></div>
+      <div class="fld"><label for="r-reason">Motivo</label><select class="f" id="r-reason">${REASONS.map(r=>`<option${S.rf.reason===r?' selected':''}>${r}</option>`).join('')}</select></div>
+      <div class="fld"><label for="r-note">Observação</label><input class="f" id="r-note" value="${esc(S.rf.note||'')}" placeholder="Ex.: disco trincado na embalagem"></div>
+      <div class="fld"><label for="r-refund">Como devolver o dinheiro</label><select class="f" id="r-refund">${Object.entries(RL).map(([k,l])=>`<option value="${k}"${S.rf.refund===k?' selected':''}>${l}</option>`).join('')}</select></div>
+      <div class="fld"><label for="r-amount">Valor a devolver</label><div class="money"><span>R$</span><input class="f" id="r-amount" inputmode="decimal" value="${num(amt)}"></div><span class="hint">Calculado pelos itens${pix?', com o desconto do Pix':''}: ${brl(auto)}. Pode ajustar.</span></div>
+      <div class="flags"><div class="flag"><span><b>Voltar para o estoque</b><small>Soma as quantidades no estoque quando o produto chegar</small></span><button class="switch" role="switch" aria-checked="${S.rf.restock}" data-rrestock aria-label="Voltar para o estoque"></button></div></div>
+      <p style="margin:0;font-size:13px;color:var(--muted)">Ao salvar, a devolução fica "Solicitada" e uma nota de devolução pendente é criada em Notas fiscais. O valor só sai do financeiro quando a devolução for marcada como reembolsada.</p>
+    </div>
+    <div class="df"><button class="btn ghost" data-back-order>Cancelar</button><button class="btn or" data-rsave>${svg('check',2.4)}Registrar devolução</button></div></section>`;
+}
+function readRF(){const g=id=>$(id)&&$(id).value;if(!$('r-reason'))return;S.rf.reason=g('r-reason');S.rf.note=g('r-note');S.rf.refund=g('r-refund');const a=parseFloat(String(g('r-amount')).replace(/\./g,'').replace(',','.'));S.rf.amountTyped=isNaN(a)?null:a}
+function retView(){
+  const r=D.returns().find(x=>x.id===S.ret); if(!r) return '';
+  const nf=D.invoices().find(n=>n.returnId===r.id);
+  const acts={solicitada:[['aprovada','Aprovar'],['recusada','Recusar']],aprovada:[['recebida','Produto recebido'],['reembolsada','Marcar reembolsada'],['recusada','Recusar']],recebida:[['reembolsada','Marcar reembolsada']]}[r.status]||[];
+  return `<div class="scrim" data-close></div><section class="drawer" role="dialog" aria-modal="true" aria-label="Devolução">
+    <div class="dh"><button class="x" data-close aria-label="Fechar">${svg('x',2)}</button><h2>Devolução ${r.id}</h2><span class="st ${rCls(r)}">${RS[r.status]}</span></div>
+    <div class="db">
+      <div class="box"><h3>Pedido #${r.orderNo} · ${esc(r.customer||'')}</h3><div style="color:var(--muted);font-size:14px">${fmt(r.created)} · ${esc(r.reason)}${r.note?'<br>'+esc(r.note):''}<br>Reembolso: ${RL[r.refund]||r.refund} · ${r.restock?(r.restocked?'já voltou ao estoque':'volta ao estoque ao receber'):'não volta ao estoque'}</div></div>
+      <div class="box"><h3>Itens</h3>${r.items.map(it=>{const p=prodAny(it[0]),x=p.vars[it[1]]||p.vars[0];return `<div class="it"><span>${esc(p.name)}<small>${esc(x.l)} · ${it[2]} ${esc(p.unit)} × ${brl(it[3])}</small></span><b>${brl(it[3]*it[2])}</b></div>`}).join('')}<div class="it"><span><b>Valor a devolver</b></span><b>${brl(r.amount)}</b></div></div>
+      <div class="box"><h3>Andamento</h3><ul class="tl">${Object.keys(RS).filter(k=>r.history[k]).map(k=>`<li class="on"><span class="dot">${svg('check',3)}</span>${RS[k]}<small>${fmt(r.history[k])}</small></li>`).join('')}</ul></div>
+      ${nf?`<button class="ocard" data-inv="${nf.id}"><span><b>Nota de devolução</b><br><small>${nf.number?'NF '+nf.number:'Sem número'} · ${brl(nf.amount)}</small></span><span class="st ${nCls(nf)}">${nLabel(nf)}</span></button>`:''}
+      <button class="btn ghost" data-order="${r.orderNo}">${svg('list')}Ver pedido #${r.orderNo}</button>
+    </div>
+    ${acts.length?`<div class="df">${acts.map(([k,l],i)=>`<button class="btn ${k==='recusada'?'bad':i===0?'or':''}" data-rst="${k}">${l}</button>`).join('')}</div>`:''}</section>`;
+}
+function invView(){
+  const n=D.invoices().find(x=>x.id===S.inv); if(!n) return '';
+  return `<div class="scrim" data-close></div><section class="drawer" role="dialog" aria-modal="true" aria-label="Nota fiscal">
+    <div class="dh"><button class="x" data-close aria-label="Fechar">${svg('x',2)}</button><h2>${n.number?'NF '+n.number:'Nota pendente'}</h2><span class="st ${nCls(n)}">${nLabel(n)}</span></div>
+    <div class="db">
+      <div class="box"><h3>Nota de ${nType(n).toLowerCase()}</h3><div class="it"><span>Número e série</span><b>${n.number||'—'} / ${n.series}</b></div><div class="it"><span>Pedido</span><b>#${n.orderNo}</b></div>${n.returnId?`<div class="it"><span>Devolução</span><b>${n.returnId}</b></div>`:''}<div class="it"><span>Cliente</span><b>${esc(n.customer)} (${n.doc.toUpperCase()})</b></div><div class="it"><span>Valor</span><b>${brl(n.amount)}</b></div><div class="it"><span>${n.issued?'Emitida em':'Criada em'}</span><b>${fmt(n.issued||n.created)}</b></div>
+        ${n.key?`<div class="it" style="display:block"><span>Chave de acesso</span><div class="mono" style="font-size:12px;word-break:break-all;margin-top:4px;user-select:all">${n.key.replace(/(\d{4})/g,'$1 ').trim()}</div></div>`:''}</div>
+      <div class="box"><h3>Arquivos</h3>
+        <div class="it"><span>XML<small>${n.files&&n.files.xml?esc(n.files.xml.name):'Sem anexo. O download gera um XML de teste.'}</small></span><span style="display:flex;gap:6px"><button class="btn ghost sm" data-attach="xml">Anexar</button><button class="btn sm" data-getxml>Baixar</button></span></div>
+        <div class="it"><span>PDF (DANFE)<small>${n.files&&n.files.pdf?esc(n.files.pdf.name):'Sem anexo. O download gera uma página de teste.'}</small></span><span style="display:flex;gap:6px"><button class="btn ghost sm" data-attach="pdf">Anexar</button><button class="btn sm" data-getpdf>Baixar</button></span></div></div>
+      <p style="margin:0;font-size:13px;color:var(--muted)">Os arquivos de teste não têm valor fiscal. Com o emissor ligado, o XML e o PDF reais entram aqui sozinhos.</p>
+      <button class="btn ghost" data-order="${n.orderNo}">${svg('list')}Ver pedido #${n.orderNo}</button>
+    </div>
+    <div class="df">${n.status==='pendente'?`<button class="btn bad" data-nfcancel>Cancelar</button><button class="btn or" data-emit>Emitir (teste)</button>`:n.status==='emitida'?`<button class="btn bad" data-nfcancel>Cancelar nota</button>`:'<span style="color:var(--muted);font-size:14px">Nota cancelada</span>'}</div></section>`;
+}
+function danfe(n){const o=D.order(n.orderNo)||{items:[]};return `<!doctype html><html lang="pt-BR"><meta charset="utf-8"><title>DANFE de teste ${n.number||''}</title><body style="font:14px Arial,sans-serif;max-width:720px;margin:24px auto;padding:0 16px">
+<p style="background:#FFF1DE;color:#9A5600;padding:10px;border-radius:8px"><b>SIMULAÇÃO, SEM VALOR FISCAL.</b> Documento de teste gerado pelo painel DBC.</p>
+<h2 style="margin:0">DBC Gases e Locações</h2><p>Rua Vinte de Maio, 320 · Bairro dos Cotianos · Piedade - SP · CEP 18170-000 · (15) 3344-2737</p>
+<p><b>${n.type==='devolucao'?'Nota de devolução':'Nota de venda'}</b> · Nº ${n.number||'—'} · Série ${n.series} · ${n.issued?new Date(n.issued).toLocaleString('pt-BR'):'não emitida'}<br>Chave: ${n.key||'—'}</p>
+<p>Destinatário: ${esc(n.customer)} (${n.doc.toUpperCase()}) · Pedido #${n.orderNo}</p>
+<table style="width:100%;border-collapse:collapse" border="1" cellpadding="6"><tr><th align="left">Produto</th><th>Qtd.</th><th>Unit.</th><th>Total</th></tr>
+${(n.type==='devolucao'?((D.returns().find(r=>r.id===n.returnId)||{}).items||[]):o.items).map(it=>{const p=prodAny(it[0]);const pr=it[3]!=null?it[3]:(p.vars[it[1]]||p.vars[0]).p;return `<tr><td>${esc(p.name)} (${esc(p.sku)})</td><td align="center">${it[2]} ${esc(p.unit)}</td><td align="right">${brl(pr)}</td><td align="right">${brl(pr*it[2])}</td></tr>`}).join('')}
+</table><p style="text-align:right;font-size:18px"><b>Valor da nota: ${brl(n.amount)}</b></p></body></html>`}
+async function zipXML(list){
+  if(!window.JSZip){await new Promise((res,rej)=>{const s=document.createElement('script');s.src='lib/jszip-3.10.1.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
+  const z=new JSZip();list.forEach(n=>{const nm=(n.type==='devolucao'?'devolucao':'venda')+'-'+(n.number||'pendente')+'-pedido-'+n.orderNo+'.xml';if(n.files&&n.files.xml&&n.files.xml.data.startsWith('data:')){z.file(nm,n.files.xml.data.split(',')[1],{base64:true})}else z.file(nm,D.invoiceXML(n))});
+  return z.generateAsync({type:'blob'});
+}
 
 function editor(){
   const p=S.edit, isNew=!D.allProducts().some(x=>x.id===p.id);
@@ -364,6 +530,9 @@ function orderView(){
         <div class="stbtns">${names.map((n,i)=>`<button data-setst="${i}" aria-pressed="${o.status===i}">${i+1}. ${n}</button>`).join('')}<button data-setst="-1" aria-pressed="${o.status===-1}" style="color:var(--bad)">Cancelar pedido</button></div></div>
       <div class="box"><h3>Andamento</h3><ul class="tl">${steps.map(s=>`<li class="${s[2]===1?'on':s[2]==='now'?'now':''}"><span class="dot">${s[2]===1?svg('check',3):''}</span>${s[0]}<small>${s[1]}</small></li>`).join('')}</ul></div>
     </div>
+      ${(()=>{const rs=D.returnsFor(o.no),ns=D.invoicesFor(o.no);return (rs.length||ns.length)?`<div class="box"><h3>Devoluções e notas</h3>${rs.map(r=>`<div class="it" style="cursor:pointer" data-ret="${r.id}"><span>Devolução ${r.id}<small>${esc(r.reason)}</small></span><span class="st ${rCls(r)}">${RS[r.status]} · ${brl(r.amount)}</span></div>`).join('')}${ns.map(n=>`<div class="it" style="cursor:pointer" data-inv="${n.id}"><span>Nota de ${nType(n).toLowerCase()}<small>${n.number?'NF '+n.number:'sem número'}</small></span><span class="st ${nCls(n)}">${nLabel(n)}</span></div>`).join('')}</div>`:''})()}
+      ${o.status>=1?`<button class="btn ghost" data-newret>${svg('ret',2)}Registrar devolução</button>`:''}
+    </div>
     <div class="df"><a class="btn ghost" href="tel:+5515988765432">${svg('phone',2)}Ligar para o cliente</a>${o.status>=0&&o.status<4?`<button class="btn" data-setst="${o.status+1}">Avançar: ${names[o.status+1]}</button>`:''}</div>
   </section>`;
 }
@@ -380,7 +549,7 @@ function renderLayer(){
   if(!S.layer){el.innerHTML='';document.body.style.overflow='';return}
   document.body.style.overflow='hidden';
   const sc=el.querySelector('.db')?.scrollTop||0;
-  el.innerHTML=S.layer==='edit'?editor():orderView();
+  el.innerHTML=S.layer==='edit'?editor():S.layer==='retform'?retForm():S.layer==='ret'?retView():S.layer==='inv'?invView():orderView();
   const db=el.querySelector('.db'); if(db) db.scrollTop=sc;
 }
 function readForm(){
@@ -396,9 +565,30 @@ function resizePhoto(file){return new Promise((res,rej)=>{const r=new FileReader
 
 document.addEventListener('input',e=>{const i=e.target.dataset&&e.target.dataset.vp;if(i!=null){const pr=parseFloat(String(e.target.value).replace(/\./g,'').replace(',','.'));const el=document.querySelector(`[data-pixp="${i}"]`);if(el)el.textContent=pr>0?brl(pr*.95)+' no Pix':''}});
 document.addEventListener('click',e=>{
-  const b=e.target.closest('button,[data-edit],.scrim'); if(!b) return;
+  const b=e.target.closest('button,[data-edit],[data-ret],[data-inv],.scrim'); if(!b) return;
   const d=b.dataset;
-  if('tab' in d){S.tab=d.tab;S.csvMsg=null;S.resetAsk=false;return render()}
+  if('tab' in d){if(S.layer){S.layer=null;renderLayer()}S.tab=d.tab;S.csvMsg=null;S.resetAsk=false;return render()}
+  if('per' in d){S.per=d.per;return render(true)}
+  if('rf' in d){S.rfilter=d.rf;return render(true)}
+  if('nf' in d){S.nfilter=d.nf;return render(true)}
+  if('ret' in d){S.ret=d.ret;S.layer='ret';return renderLayer()}
+  if('inv' in d){S.inv=d.inv;S.layer='inv';return renderLayer()}
+  if('newret' in d){const o=D.order(S.order);S.rf={orderNo:o.no,q:{},reason:REASONS[0],note:'',refund:o.pay,restock:true,amount:null};S.err='';S.layer='retform';return renderLayer()}
+  if('backOrder' in d){S.layer='order';S.err='';return renderLayer()}
+  if('rq' in d){readRF();S.rf.amount=null;const o=D.order(S.rf.orderNo),i=+d.rq;S.rf.q[i]=Math.max(0,Math.min(o.items[i][2],(S.rf.q[i]||0)+ +d.d));return renderLayer()}
+  if('rall' in d){readRF();S.rf.amount=null;D.order(S.rf.orderNo).items.forEach((it,i)=>S.rf.q[i]=it[2]);return renderLayer()}
+  if('rrestock' in d){readRF();S.rf.amount=S.rf.amountTyped;S.rf.restock=!S.rf.restock;return renderLayer()}
+  if('rsave' in d){readRF();const o=D.order(S.rf.orderNo);const items=o.items.map((it,i)=>[it[0],it[1],S.rf.q[i]||0,it[3]]).filter(it=>it[2]>0);if(!items.length){S.err='Escolha pelo menos um item que volta.';return renderLayer()}const amt=S.rf.amountTyped;if(!(amt>0)){S.err='Informe o valor a devolver.';return renderLayer()}const r=D.createReturn({orderNo:o.no,items,reason:S.rf.reason+(S.rf.note?'':''),note:S.rf.note,refund:S.rf.refund,restock:S.rf.restock,amount:amt});S.ret=r.id;S.layer='ret';toast('Devolução '+r.id+' registrada');renderLayer();return render(true)}
+  if('rst' in d){D.setReturnStatus(S.ret,d.rst);toast('Devolução: '+RS[d.rst]);renderLayer();return render(true)}
+  if('emit' in d){D.emitInvoice(S.inv);toast('Nota emitida (teste)');renderLayer();return render(true)}
+  if('nfcancel' in d){D.setInvoiceStatus(S.inv,'cancelada');toast('Nota cancelada');renderLayer();return render(true)}
+  if('attach' in d){S.attachKind=d.attach;const f=$('nffile');f.accept=d.attach==='xml'?'.xml,text/xml,application/xml':'.pdf,application/pdf';f.value='';return f.click()}
+  if('getxml' in d){const n=D.invoices().find(x=>x.id===S.inv);if(n.files&&n.files.xml)return dl(n.files.xml.name,n.files.xml.data);return dl('nota-'+(n.number||'pendente')+'-pedido-'+n.orderNo+'-TESTE.xml',D.invoiceXML(n),'application/xml')}
+  if('getpdf' in d){const n=D.invoices().find(x=>x.id===S.inv);if(n.files&&n.files.pdf)return dl(n.files.pdf.name,n.files.pdf.data);return dl('danfe-'+(n.number||'pendente')+'-pedido-'+n.orderNo+'-TESTE.html',danfe(n),'text/html;charset=utf-8')}
+  if('nfcsv' in d){const rg=range();const l=D.invoices().filter(n=>inR(n.issued||n.created,rg)&&(S.nfilter==='all'||n.status===S.nfilter));dl('dbc-notas.csv','\ufeff'+[['numero','serie','tipo','situacao','pedido','devolucao','cliente','documento','valor','criada','emitida','chave'].join(';')].concat(l.map(n=>[n.number||'',n.series,nType(n),nLabel(n),n.orderNo,n.returnId||'',n.customer,n.doc.toUpperCase(),num(n.amount),n.created,n.issued||'',n.key||''].map(csvq).join(';'))).join('\n'),'text/csv;charset=utf-8');return toast('Planilha de notas baixada')}
+  if('nfzip' in d){const rg=range();const l=D.invoices().filter(n=>inR(n.issued||n.created,rg)&&(S.nfilter==='all'||n.status===S.nfilter));if(!l.length)return toast('Nenhuma nota no filtro');zipXML(l).then(b=>{dl('dbc-notas-xml.zip',b);toast(l.length+' XMLs no ZIP')}).catch(()=>toast('Não deu para gerar o ZIP agora'));return}
+  if('finexport' in d){const F=finCalc();dl('dbc-financeiro.csv','\ufeff'+['data;tipo;pedido;detalhe;valor'].concat(finMoves(F).map(m=>[new Date(m.d).toLocaleString('pt-BR'),m.t,m.o,m.x||'',num(m.v)].map(csvq).join(';'))).join('\n'),'text/csv;charset=utf-8');return toast('Planilha do financeiro baixada')}
+  if('savefees' in d){const st=D.settings();['pix','card','boleto'].forEach(k=>{const p=parseFloat(String(document.querySelector(`[data-feep="${k}"]`).value).replace(',','.'))||0,f=parseFloat(String(document.querySelector(`[data-feef="${k}"]`).value).replace(',','.'))||0;st.fees[k]={pct:p,fixed:f}});D.saveSettings(st);toast('Taxas salvas');return render(true)}
   if('close' in d) return close();
   if('toggle' in d){e.stopPropagation();const p=D.allProducts().find(x=>x.id===d.toggle);p.active=p.active===false;D.saveProduct(p);toast(p.active?'Produto visível no app':'Produto escondido do app');return render(true)}
   if('edit' in d){S.edit=JSON.parse(JSON.stringify(D.allProducts().find(x=>x.id===d.edit)));S.layer='edit';return renderLayer()}
@@ -418,7 +608,7 @@ document.addEventListener('click',e=>{
   if('delNo' in d){S.delAsk=false;return renderLayer()}
   if('delYes' in d){D.deleteProduct(S.edit.id);close();toast('Produto excluído');return render(true)}
   if('of' in d){S.ofilter=d.of;return render(true)}
-  if('order' in d){S.order=d.order;S.layer='order';return renderLayer()}
+  if('order' in d){S.order=d.order;S.layer='order';S.err='';return renderLayer()}
   if('setst' in d){D.setStatus(S.order,+d.setst);toast('Situação atualizada: '+D.statusLabel(D.order(S.order)));renderLayer();return render(true)}
   if('export' in d){const blob=new Blob([D.toCSV()],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='dbc-produtos.csv';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);toast('Planilha baixada');return}
   if('import' in d){$('csvfile').value='';return $('csvfile').click()}
@@ -429,6 +619,8 @@ document.addEventListener('click',e=>{
 $('csvfile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=D.fromCSV(String(r.result));S.csvMsg={text:`${x.added} produtos novos e ${x.updated} atualizados.`+(x.errors.length?` ${x.errors.length} linhas ignoradas: ${x.errors.slice(0,3).join('; ')}`:''),bad:false}}catch(err){S.csvMsg={text:'Não deu para ler a planilha: '+err.message,bad:true}}render(true)};r.readAsText(f,'utf-8')});
 $('photofile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{S.edit.photo=await resizePhoto(f)}catch(_){S.err='Não deu para abrir essa imagem.'}renderLayer()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&S.layer)close()});
+$('nffile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;if(f.size>1.5e6){toast('Arquivo grande demais para o teste (máx. 1,5 MB)');return}const r=new FileReader();r.onload=()=>{if(D.attachInvoiceFile(S.inv,S.attachKind,f.name,r.result))toast('Arquivo anexado');else toast('Sem espaço neste navegador para o arquivo');renderLayer();render(true)};r.readAsDataURL(f)});
+document.addEventListener('change',e=>{if(e.target.id==='pf'){S.from=e.target.value;render(true)}if(e.target.id==='pt'){S.to=e.target.value;render(true)}});
 D.onChange(()=>{if(!S.layer)render(true)});
 render();
 })();

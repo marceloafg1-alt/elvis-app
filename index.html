@@ -357,7 +357,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--spark);outline-
   </div>
 </div>
 
-<script src="data/store.js?v=9"></script>
+<script src="data/store.js?v=10"></script>
 <script>
 window.addEventListener('error',function(e){var v=document.getElementById('view');if(v&&!v.innerHTML)v.innerHTML='<div style="padding:24px;font:14px system-ui">Não foi possível abrir o protótipo neste aparelho.<br><small>'+(e.message||'')+'</small></div>'});
 (function(){
@@ -464,12 +464,14 @@ const ORDERS=[
 function fmtDate(iso){const d=new Date(iso),t=new Date(),hm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');return d.toDateString()===t.toDateString()?'Hoje às '+hm:String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+' às '+hm}
 function ORDERS_(){ if(!window.DBCStore) return ORDERS; return DBCStore.orders().map(o=>Object.assign({},o,{stage:o.status,status:o.status===-1?'cx':o.status>=4?'ok':'go',label:DBCStore.statusLabel(o),date:fmtDate(o.created),steps:DBCStore.steps(o)})); }
 function prodAny(id){ return byId(id) || (window.DBCStore && DBCStore.allProducts().find(p=>p.id===id)) || {id,name:'Produto removido do catálogo',sku:'—',unit:'un',cat:'ferragens',sub:'',brand:'',vars:[{l:'—',p:0}],specs:[]}; }
+const RL={pix:'Pix',card:'estorno no cartão',boleto:'transferência bancária',credito:'crédito na loja'};
+function retBlock(o){const rs=window.DBCStore?DBCStore.returnsFor(o.no):[];if(!rs.length)return '';return `<div class="lbl">Devolução</div>`+rs.map(r=>`<div class="note ${r.status==='recusada'?'warn':'ok'}">${svg('box',2)}<span><b>${r.id} · ${DBCStore.RETURN_STATUS[r.status]}</b><br>${r.items.reduce((a,i)=>a+i[2],0)} ${r.items.reduce((a,i)=>a+i[2],0)===1?'item':'itens'} · ${brl(r.amount)} · reembolso por ${RL[r.refund]||r.refund}${r.status==='reembolsada'?' · valor já devolvido':r.status==='recusada'?'':' · em análise pela loja'}</span></div>`).join('')}
 const vr=(p,v)=>p.vars[v]||p.vars[0];
 function placeOrder(paid,doc){ if(!window.DBCStore||!S.cart.length) return null; return DBCStore.createOrder({items:S.cart.map(c=>[c.id,c.v,c.q]),ship:S.ship,pay:S.pay,doc,paid}); }
 function syncStore(){ if(!window.DBCStore) return; P=DBCStore.products(); S.cart=S.cart.filter(c=>byId(c.id)&&byId(c.id).vars[c.v]); }
 const ORD=no=>ORDERS_().find(o=>o.no===String(no));
 const SHIP_L={moto:'Moto',truck:'Caminhonete agendada',pickup:'Retirada na loja'};
-function oTot(o){const sub=o.items.reduce((a,[id,v,q])=>a+vr(prodAny(id),v).p*q,0),fee={moto:14.90,truck:39.90,pickup:0}[o.ship],disc=o.pay==='pix'?sub*.05:0;return {sub,fee,disc,total:sub+fee-disc}}
+function oTot(o){if(window.DBCStore&&o.items[0]&&o.items[0].length>3)return DBCStore.totals(o);const sub=o.items.reduce((a,[id,v,q])=>a+vr(prodAny(id),v).p*q,0),fee={moto:14.90,truck:39.90,pickup:0}[o.ship],disc=o.pay==='pix'?sub*.05:0;return {sub,fee,disc,total:sub+fee-disc}}
 function payL(o,t){return o.pay==='pix'?'Pix com 5% de desconto':o.pay==='card'?'Cartão de crédito, 3x de '+brl(t.total/3):'Boleto bancário'}
 function oSummary(o){return o.items.length+(o.items.length===1?' produto':' produtos')+' · '+SHIP_L[o.ship].toLowerCase()}
 
@@ -616,9 +618,9 @@ const R = {
       <div class="card"><div class="k">Feito em</div>${o.date}<div class="unit">${SHIP_L[o.ship]} · ${payL(o,t)}</div></div>
       ${live?`<button class="cta dark" data-go="track">${svg('moto',2)}Acompanhar no mapa</button>`:''}
       <div class="lbl">Itens (${o.items.length})</div>
-      <div class="list">${o.items.map(([id,v,q])=>{const p=prodAny(id),x=vr(p,v);return `<div class="li">${thumb(p)}<div style="min-width:0"><div class="li-top">${p.name}</div><div class="li-var">${x.l} · ${q} ${p.unit} × ${brl(x.p)}</div><div class="li-bot"><span class="unit">${p.sku}</span><b class="price">${brl(x.p*q)}</b></div></div></div>`}).join('')}</div>
+      <div class="list">${o.items.map(([id,v,q,pr])=>{const p=prodAny(id),x=pr!=null?Object.assign({},vr(p,v),{p:pr}):vr(p,v);return `<div class="li">${thumb(p)}<div style="min-width:0"><div class="li-top">${p.name}</div><div class="li-var">${x.l} · ${q} ${p.unit} × ${brl(x.p)}</div><div class="li-bot"><span class="unit">${p.sku}</span><b class="price">${brl(x.p*q)}</b></div></div></div>`}).join('')}</div>
       <div class="sum"><div class="r"><span>Produtos</span><span>${brl(t.sub)}</span></div><div class="r"><span>Entrega</span><span>${t.fee?brl(t.fee):'Grátis'}</span></div>${t.disc?`<div class="r disc"><span>Desconto Pix</span><span>−${brl(t.disc)}</span></div>`:''}<div class="r tot"><span>Total</span><span>${brl(t.total)}</span></div></div>
-      <div class="lbl">${o.ship==='pickup'?'Retirada':'Entrega'}</div>
+      ${retBlock(o)}<div class="lbl">${o.ship==='pickup'?'Retirada':'Entrega'}</div>
       <div class="card">${o.ship==='pickup'?'DBC Gases e Locações<div class="unit">Rua Vinte de Maio, 320 · Bairro dos Cotianos · Piedade - SP</div>':'Rua das Indústrias, 450, galpão 3 · Distrito Industrial, Piedade - SP<div class="unit">Recebe: Marcos · (15) 9 8765-4321</div>'}</div>
       <div class="lbl">Andamento</div>
       <ol class="steps">${o.steps.map(s=>`<li class="${s[2]===1?'done':s[2]==='now'?'now':''}"><span class="dot">${s[2]===1?svg('check',3):''}</span><span><b>${s[0]}</b><small>${s[1]}</small></span></li>`).join('')}</ol>
