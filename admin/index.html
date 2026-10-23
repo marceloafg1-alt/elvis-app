@@ -208,6 +208,71 @@ textarea.f{min-height:96px;resize:vertical;font-size:14px}
 .kpi small{color:var(--muted);font-size:13px;font-weight:600}
 .kpi b{display:block;font-size:24px;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+
+/* Visual da versão 2: fundo em degradê suave, cartões bem arredondados com sombra leve, destaque marinho em degradê, botões em pílula e barra de abas flutuante. */
+:root{--bg-top:#DDE8F3;--bg:#F5F7FA;--tint:#E8F0F8;--tint-ink:#0E3A66;--line:#E3E9F0;--muted:#66768A;--shadow:0 12px 30px -18px rgba(0,33,63,.35);
+  --hero:radial-gradient(120% 90% at 0% 0%,#1C6BA8 0%,transparent 55%),linear-gradient(160deg,#0E4C82 0%,#00213F 78%)}
+@media (prefers-color-scheme:dark){:root{--bg-top:#0D2440;--bg:#07111C;--tint:#16304B;--tint-ink:#8CC6EC;--line:#1D3047;--soft:#15283D;--hero:radial-gradient(120% 90% at 0% 0%,#1A5E98 0%,transparent 55%),linear-gradient(160deg,#0D3C68 0%,#061A30 78%)}}
+html{background:var(--bg)}
+body{background:linear-gradient(180deg,var(--bg-top) 0,var(--bg) 420px) no-repeat,var(--bg)}
+.topbar{background:linear-gradient(var(--bg-top),rgba(221,232,243,.72));color:var(--ink);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+@media (prefers-color-scheme:dark){.topbar{background:linear-gradient(var(--bg-top),rgba(13,36,64,.75))}}
+.topbar .lg{height:40px;padding:0 12px;border-radius:12px;background:#00213F;display:grid;place-items:center}
+.topbar .lg svg{height:26px}
+.topbar .t{color:var(--muted);font-weight:500}
+main{padding-bottom:calc(120px + var(--sb))}
+.tabs{left:12px;right:12px;bottom:calc(10px + var(--sb));padding:6px;border:1px solid var(--line);border-radius:26px;box-shadow:0 18px 36px -16px rgba(0,33,63,.45);gap:4px}
+.tabs button{padding:8px 0 9px;border-radius:20px;font-weight:600}
+.tabs button .i{width:22px;height:22px}
+.tabs button[aria-current="true"]{background:var(--tint);color:var(--tint-ink)}
+@media (prefers-color-scheme:dark){.tabs button[aria-current="true"]{color:var(--tint-ink)}}
+@media (min-width:900px){
+  body{grid-template-columns:276px minmax(0,1fr)}
+  .side{margin:14px 0 14px 14px;height:calc(100vh - 28px);top:14px;border-radius:30px;background:var(--hero);box-shadow:0 24px 40px -24px rgba(0,33,63,.7);overflow:hidden;position:sticky}
+  .side::after{content:"";position:absolute;right:-60px;bottom:-70px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(242,138,38,.32),transparent 70%);pointer-events:none}
+  .side > *{position:relative;z-index:1}
+  .side button,.side a{border-radius:16px;padding:11px 14px}
+  .side button[aria-current="true"]{background:rgba(255,255,255,.14)}
+  .side .lbl{color:#9DB6CF}
+  main{padding:34px 36px 48px}
+}
+.ph h1{font-size:clamp(30px,7vw,38px);font-weight:600;letter-spacing:-.025em;line-height:1.08}
+.ph{margin-bottom:18px}
+.btn{height:46px;border-radius:999px;padding:0 20px}
+.btn:not(.ghost):not(.bad):not(.or){background:linear-gradient(135deg,var(--navy-2),var(--navy));box-shadow:0 12px 22px -14px rgba(0,33,63,.8)}
+.btn.or{box-shadow:0 12px 22px -14px rgba(242,138,38,.9)}
+.btn.ghost{box-shadow:var(--shadow)}
+.btn.sm{height:36px;border-radius:999px;padding:0 14px}
+.search{border-radius:999px;height:50px;padding:0 18px;box-shadow:var(--shadow)}
+select.f,input.f,textarea.f{border-radius:14px}
+.tools select.f{border-radius:999px;padding:10px 16px;box-shadow:var(--shadow)}
+.chip{padding:9px 16px;font-weight:500;font-size:14.5px}
+.plist{border-radius:24px;box-shadow:var(--shadow)}
+.prow{padding:14px 16px}
+.thumb{border-radius:15px;background:var(--tint);color:var(--tint-ink)}
+.tag{background:var(--tint);color:var(--tint-ink)}
+.ocard,.box,.dcard,.flags{border-radius:22px;box-shadow:var(--shadow)}
+.ocard{padding:16px 18px;gap:6px 12px}
+.box{padding:16px 18px}
+.box h3,.dcard h3{font-weight:600;letter-spacing:-.01em}
+.kpis{gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.kpi{border-radius:22px;padding:14px 16px;box-shadow:var(--shadow)}
+.kpi b{font-weight:700;margin-top:4px}
+.kpi.hero{background:var(--hero);border:0;color:#fff;position:relative;overflow:hidden;grid-column:span 2;box-shadow:0 24px 40px -24px rgba(0,33,63,.7)}
+.kpi.hero::after{content:"";position:absolute;right:-40px;bottom:-60px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(242,138,38,.35),transparent 70%);pointer-events:none}
+.kpi.hero small{color:#D7E5F3}
+.kpi.hero b{font-size:32px;color:#fff!important}
+@media (max-width:340px){.kpi.hero{grid-column:auto}}
+.notice{border-radius:22px}
+.drawer{background:linear-gradient(180deg,var(--bg-top) 0,var(--bg) 260px) no-repeat,var(--bg)}
+.dh{background:transparent;border-bottom:0;padding-top:16px;padding-bottom:8px}
+.dh h2{font-size:22px;font-weight:600;letter-spacing:-.02em}
+.x{border-radius:50%;width:44px;height:44px;box-shadow:var(--shadow)}
+.df{background:var(--card);border-top:1px solid var(--line);border-radius:26px 26px 0 0;box-shadow:0 -12px 30px -20px rgba(0,33,63,.35)}
+@media (min-width:900px){.drawer{inset:12px 12px 12px auto;border-radius:30px;overflow:hidden;box-shadow:0 30px 60px -20px rgba(0,20,40,.55)}.df{border-radius:0}}
+.stbtns button{border-radius:16px}
+.stbtns button[aria-pressed="true"]{background:var(--tint)}
+.toast{bottom:calc(100px + var(--sb))}
 </style>
 </head>
 <body>
@@ -220,7 +285,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 <input type="file" id="photofile" accept="image/*" hidden>
 <input type="file" id="nffile" hidden>
 
-<script src="../data/store.js?v=10"></script>
+<script src="../data/store.js?v=11"></script>
 <script>
 (function(){
 const D = window.DBCStore;
@@ -304,7 +369,7 @@ const V = {
     const list=all.filter(f);
     const today=all.filter(o=>new Date(o.created).toDateString()===new Date().toDateString());
     return `<div class="ph"><div><h1>Pedidos</h1><p>Pedidos feitos nos apps aparecem aqui</p></div></div>
-    <div class="kpis"><div class="kpi"><small>Em andamento</small><b>${all.filter(o=>o.status>=0&&o.status<4).length}</b></div><div class="kpi"><small>Hoje</small><b>${today.length}</b></div><div class="kpi"><small>Vendido hoje</small><b>${brl(today.filter(o=>o.status>=1).reduce((a,o)=>a+oTot(o).total,0))}</b></div></div>
+    <div class="kpis"><div class="kpi hero"><small>Em andamento</small><b>${all.filter(o=>o.status>=0&&o.status<4).length}</b></div><div class="kpi"><small>Hoje</small><b>${today.length}</b></div><div class="kpi"><small>Vendido hoje</small><b>${brl(today.filter(o=>o.status>=1).reduce((a,o)=>a+oTot(o).total,0))}</b></div></div>
     <div class="filters">${[['open','Em andamento'],['done','Concluídos'],['cx','Cancelados'],['all','Todos']].map(([k,l])=>`<button class="chip" data-of="${k}" aria-pressed="${S.ofilter===k}">${l}</button>`).join('')}</div>
     <div class="olist">${list.length?list.map(o=>`<button class="ocard" data-order="${o.no}"><span><b>#${o.no}</b> · ${esc(o.customer||'Cliente')}<br><small>${fmt(o.created)} · ${SHIP_L[o.ship]} · ${PAY_L[o.pay]}</small></span>
       <span style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="st ${stCls(o)}">${D.statusLabel(o)}</span><span class="tot">${brl(oTot(o).total)}</span></span></button>`).join(''):`<div class="empty">Nenhum pedido aqui.</div>`}</div>`;
@@ -376,10 +441,10 @@ Object.assign(V,{
     return `<div class="ph"><div><h1>Financeiro</h1><p>Movimentação das vendas feitas pelo app</p></div><button class="btn ghost" data-finexport>${svg('down',2)}Exportar CSV</button></div>
     ${perBar()}
     <div class="kpis">
+      <div class="kpi hero"><small>Líquido no período</small><b>${brl(F.net)}</b></div>
       <div class="kpi"><small>Vendas brutas</small><b>${brl(F.gross)}</b></div>
       <div class="kpi"><small>Taxas de pagamento</small><b style="color:var(--bad)">−${brl(F.fees)}</b></div>
       <div class="kpi"><small>Devoluções (estornos)</small><b style="color:var(--bad)">−${brl(F.ref)}</b></div>
-      <div class="kpi" style="border-color:var(--navy-2)"><small>Líquido</small><b>${brl(F.net)}</b></div>
       <div class="kpi"><small>Pedidos pagos</small><b>${F.count}</b></div>
       <div class="kpi"><small>Ticket médio</small><b>${brl(F.ticket)}</b></div>
       <div class="kpi"><small>A reembolsar</small><b style="color:var(--warn)">${brl(F.toRefund)}</b></div></div>
@@ -397,7 +462,7 @@ Object.assign(V,{
     const all=D.returns(), f={open:r=>['solicitada','aprovada','recebida'].includes(r.status),done:r=>r.status==='reembolsada',no:r=>r.status==='recusada',all:()=>true}[S.rfilter];
     const list=all.filter(f);
     return `<div class="ph"><div><h1>Devoluções</h1><p>Para registrar, abra o pedido em Pedidos e toque em "Registrar devolução"</p></div><button class="btn ghost" data-tab="orders">${svg('list')}Ir para pedidos</button></div>
-    <div class="kpis"><div class="kpi"><small>Em aberto</small><b>${all.filter(r=>['solicitada','aprovada','recebida'].includes(r.status)).length}</b></div><div class="kpi"><small>A reembolsar</small><b>${brl(all.filter(r=>['solicitada','aprovada','recebida'].includes(r.status)).reduce((a,r)=>a+r.amount,0))}</b></div><div class="kpi"><small>Já reembolsado</small><b>${brl(all.filter(r=>r.status==='reembolsada').reduce((a,r)=>a+r.amount,0))}</b></div></div>
+    <div class="kpis"><div class="kpi hero"><small>Em aberto</small><b>${all.filter(r=>['solicitada','aprovada','recebida'].includes(r.status)).length}</b></div><div class="kpi"><small>A reembolsar</small><b>${brl(all.filter(r=>['solicitada','aprovada','recebida'].includes(r.status)).reduce((a,r)=>a+r.amount,0))}</b></div><div class="kpi"><small>Já reembolsado</small><b>${brl(all.filter(r=>r.status==='reembolsada').reduce((a,r)=>a+r.amount,0))}</b></div></div>
     <div class="filters">${[['open','Em aberto'],['done','Reembolsadas'],['no','Recusadas'],['all','Todas']].map(([k,l])=>`<button class="chip" data-rf="${k}" aria-pressed="${S.rfilter===k}">${l}</button>`).join('')}</div>
     <div class="olist">${list.length?list.map(r=>`<button class="ocard" data-ret="${r.id}"><span><b>${r.id}</b> · pedido #${r.orderNo} · ${esc(r.customer||'')}<br><small>${fmt(r.created)} · ${esc(r.reason)} · ${RL[r.refund]||r.refund}</small></span>
       <span style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="st ${rCls(r)}">${RS[r.status]}</span><span class="tot">${brl(r.amount)}</span></span></button>`).join(''):`<div class="empty">Nenhuma devolução aqui.</div>`}</div>`;
@@ -529,7 +594,6 @@ function orderView(){
       <div class="box"><h3>Mudar situação</h3><p style="margin:0 0 10px;color:var(--muted);font-size:13.5px">O cliente vê a mudança no app, na tela do pedido.</p>
         <div class="stbtns">${names.map((n,i)=>`<button data-setst="${i}" aria-pressed="${o.status===i}">${i+1}. ${n}</button>`).join('')}<button data-setst="-1" aria-pressed="${o.status===-1}" style="color:var(--bad)">Cancelar pedido</button></div></div>
       <div class="box"><h3>Andamento</h3><ul class="tl">${steps.map(s=>`<li class="${s[2]===1?'on':s[2]==='now'?'now':''}"><span class="dot">${s[2]===1?svg('check',3):''}</span>${s[0]}<small>${s[1]}</small></li>`).join('')}</ul></div>
-    </div>
       ${(()=>{const rs=D.returnsFor(o.no),ns=D.invoicesFor(o.no);return (rs.length||ns.length)?`<div class="box"><h3>Devoluções e notas</h3>${rs.map(r=>`<div class="it" style="cursor:pointer" data-ret="${r.id}"><span>Devolução ${r.id}<small>${esc(r.reason)}</small></span><span class="st ${rCls(r)}">${RS[r.status]} · ${brl(r.amount)}</span></div>`).join('')}${ns.map(n=>`<div class="it" style="cursor:pointer" data-inv="${n.id}"><span>Nota de ${nType(n).toLowerCase()}<small>${n.number?'NF '+n.number:'sem número'}</small></span><span class="st ${nCls(n)}">${nLabel(n)}</span></div>`).join('')}</div>`:''})()}
       ${o.status>=1?`<button class="btn ghost" data-newret>${svg('ret',2)}Registrar devolução</button>`:''}
     </div>
