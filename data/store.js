@@ -133,7 +133,23 @@
   function deliveryCode(o){ if(!o) return ''; if(o.code) return o.code; if(o.no === '4821') return '7314'; var h = 0; String(o.no).split('').forEach(function(c){ h = (h * 31 + c.charCodeAt(0)) % 9000; }); return String(1000 + h); }
   function addrOf(o){ return (o && o.addr) || 'Rua das Indústrias, 450, galpão 3 · Distrito Industrial, Piedade - SP'; }
   function phoneOf(o){ return (o && o.phone) || '(15) 98765-4321'; }
-  function confirmDelivery(no, code, by){ var o = order(no); if(!o || o.status !== 3 || String(code).trim() !== deliveryCode(o)) return false; setStatus(no, 4, by || 'entregador'); return true; }
+  // proof: { name: quem recebeu, photo: dataURL opcional, cascos: cascos vazios recolhidos, note }
+  function confirmDelivery(no, code, by, proof){
+    var o = order(no); if(!o || o.status !== 3 || String(code).trim() !== deliveryCode(o)) return false;
+    if(proof){ var list = adapter.load(KEY_O), x = list.find(function(y){ return y.no === o.no; }); x.proof = { name: proof.name || '', photo: proof.photo || null, cascos: proof.cascos || 0, note: proof.note || '', t: now(), by: by || 'entregador' }; adapter.save(KEY_O, list); }
+    setStatus(no, 4, by || 'entregador'); return true;
+  }
+  // Cascos vazios a recolher: itens de gás na opção "Recarga" (troca do cilindro).
+  function cascosFor(o){ return (o && o.items || []).reduce(function(a, it){ var p = findProduct(it[0]); return a + (p && p.gas && it[1] === 0 ? it[2] : 0); }, 0); }
+  var ISSUES = ['Cliente ausente', 'Endereço não encontrado', 'Cliente recusou', 'Produto avariado', 'Outro motivo'];
+  // Entrega não realizada: o pedido volta para "pronto para sair" e a loja recebe o aviso.
+  function deliveryIssue(no, reason, note, by){
+    var list = adapter.load(KEY_O) || seedOrders(), o = list.find(function(x){ return x.no === String(no); }); if(!o) return;
+    o.issues = o.issues || []; o.issues.push({ t: now(), reason: reason, note: note || '', by: by || 'entregador' });
+    o.status = 2; o.history.length = 3; o.by = o.by || {};
+    logEvent({ type: 'issue', orderNo: o.no, status: 2, by: by || 'entregador', customer: o.customer, text: 'Não entregue: ' + reason + (note ? ' (' + note + ')' : '') });
+    saveOrders(list);
+  }
 
   // ---------- preços e totais ----------
   function findProduct(id){ return allProducts().find(function(p){ return p.id === id; }) || SEED.products.find(function(p){ return p.id === id; }); }
@@ -284,7 +300,7 @@
   window.DBCStore = {
     adapter: adapter.name, cats: SEED.cats,
     products: products, allProducts: allProducts, saveProduct: saveProduct, deleteProduct: deleteProduct,
-    orders: orders, order: order, createOrder: createOrder, setStatus: setStatus, deliveryCode: deliveryCode, addrOf: addrOf, phoneOf: phoneOf, confirmDelivery: confirmDelivery, steps: steps, statusLabel: statusLabel,
+    orders: orders, order: order, createOrder: createOrder, setStatus: setStatus, deliveryCode: deliveryCode, cascosFor: cascosFor, deliveryIssue: deliveryIssue, ISSUES: ISSUES, addrOf: addrOf, phoneOf: phoneOf, confirmDelivery: confirmDelivery, steps: steps, statusLabel: statusLabel,
     toCSV: toCSV, fromCSV: fromCSV, reset: reset,
     totals: totals, priceOf: priceOf,
     invoices: invoices, invoicesFor: invoicesFor, emitInvoice: emitInvoice, setInvoiceStatus: setInvoiceStatus, attachInvoiceFile: attachInvoiceFile, invoiceXML: invoiceXML,

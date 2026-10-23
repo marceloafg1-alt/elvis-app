@@ -279,6 +279,7 @@ main{padding-bottom:calc(120px + var(--sb))}
 .qnew .i{color:#fff}
 .tl .by{font-size:11.5px;font-weight:600;color:var(--tint-ink);background:var(--tint);border-radius:999px;padding:2px 8px;margin-left:6px}
 .it > .st{align-self:center}
+.proof img{width:100%;max-height:260px;object-fit:cover;border-radius:14px;margin-top:8px;display:block}
 .evc.new{border-color:var(--orange);box-shadow:0 0 0 2px rgba(242,138,38,.25),var(--shadow)}
 details.fix summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
 details.fix summary::-webkit-details-marker{display:none}
@@ -343,7 +344,7 @@ select.f,input.f,textarea.f{border-radius:14px}
 <input type="file" id="photofile" accept="image/*" hidden>
 <input type="file" id="nffile" hidden>
 
-<script src="../data/store.js?v=13"></script>
+<script src="../data/store.js?v=14"></script>
 <script>
 (function(){
 const D = window.DBCStore;
@@ -687,7 +688,7 @@ const evFrom=e=>e.by!=='loja';
 function seenAt(){try{return localStorage.getItem(SEEN_K)||''}catch(_){return ''}}
 function unread(){const t=seenAt();return D.events().filter(e=>evFrom(e)&&e.t>t).length}
 const BY_L={entregador:'pelo entregador',app:'pelo cliente no app','automático':'automático',loja:'pela loja'};
-function evIcon(e){return e.type==='order'?'list':e.type==='return'?'ret':e.status===3||e.status===4?'truck':'check'}
+function evIcon(e){return e.type==='issue'?'x':e.type==='order'?'list':e.type==='return'?'ret':e.status===3||e.status===4?'truck':'check'}
 function evTitle(e){return e.type==='status'?`#${e.orderNo} · ${e.text}`:`#${e.orderNo} · ${e.text}`}
 function feedView(){
   const t=seenAt(), l=D.events().slice(0,60), np=('Notification' in window)?Notification.permission:'na';
@@ -751,6 +752,10 @@ function orderView(){
         <div class="it"><span>Pagamento<small>${o.status>=1||o.status===4?(o.by&&o.by[1]==='loja'?'Marcado como pago pela loja':'Confirmado pelo Mercado Pago')+(o.history[1]?' · '+fmt(o.history[1]):''):o.status===-1?'Pedido cancelado':'O app confirma sozinho quando o cliente pagar'}</small></span><span class="st ${o.status>=1?'s4':o.status===-1?'sx':'s3'}">${o.status>=1?'Pago':o.status===-1?'Cancelado':'Aguardando'}</span></div>
         <div class="it"><span>Nota fiscal<small>${nf?(nf.number?'NF '+nf.number+' · emitida ao confirmar o pagamento':'Pendente'):'Sai sozinha quando o pagamento for confirmado'}</small></span>${nf?`<span class="st ${nCls(nf)}">${nLabel(nf)}</span>`:'<span class="st s0">—</span>'}</div>
         ${o.ship!=='pickup'&&o.status>=0&&o.status<4?`<div class="it"><span>Código de entrega<small>O cliente informa ao entregador para confirmar</small></span><b class="mono" style="font-size:18px">${D.deliveryCode(o)}</b></div>`:''}</div>`})()}
+      ${(()=>{const pr=o.proof,is=o.issues||[],cas=D.cascosFor(o);if(!pr&&!is.length&&!(cas&&o.ship!=='pickup'))return '';return `<div class="box"><h3>Entrega</h3>
+        ${cas&&o.ship!=='pickup'?`<div class="it"><span>Troca de cilindro<small>Cascos vazios a recolher</small></span><b>${pr?pr.cascos+' de '+cas:cas}</b></div>`:''}
+        ${pr?`<div class="it"><span>Recebido por<small>${fmt(pr.t)} · ${{entregador:'confirmado pelo entregador com o código',loja:'pela loja'}[pr.by]||''}</small></span><b>${esc(pr.name||'—')}</b></div>${pr.photo?`<a href="${pr.photo}" target="_blank" rel="noopener" class="proof"><img src="${pr.photo}" alt="Foto da entrega"></a>`:''}`:''}
+        ${is.map(x=>`<div class="it"><span style="color:var(--warn)">Não entregue: ${esc(x.reason)}<small>${fmt(x.t)}${x.note?' · '+esc(x.note):''}</small></span><span class="st s3">Tentativa</span></div>`).join('')}</div>`})()}
       <div class="box"><h3>Itens</h3>${o.items.map(([id,v,q])=>{const p=prodAny(id),x=p.vars[v]||p.vars[0];return `<div class="it"><span>${esc(p.name)}<small>${esc(x.l)} · ${q} ${esc(p.unit)} × ${brl(x.p)} · ${esc(p.sku)}</small></span><b>${brl(x.p*q)}</b></div>`}).join('')}</div>
       <div class="box sum"><div><span>Produtos</span><span>${brl(t.sub)}</span></div><div><span>Entrega</span><span>${t.fee?brl(t.fee):'Grátis'}</span></div>${t.disc?`<div class="d"><span>Desconto Pix</span><span>−${brl(t.disc)}</span></div>`:''}<div class="t"><span>Total</span><span>${brl(t.total)}</span></div></div>
       <details class="box fix"><summary><h3>Corrigir situação</h3><span>Use se algo foi marcado errado</span></summary>

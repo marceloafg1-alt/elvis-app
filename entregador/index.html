@@ -90,6 +90,31 @@ svg.i{width:22px;height:22px;flex:none}
 .links a,.links button{color:var(--tint-ink);font-weight:600;background:none;border:0;padding:0;cursor:pointer}
 .sync{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
 .sync i{width:8px;height:8px;border-radius:50%;background:var(--muted)}.sync.on i{background:var(--ok)}
+.btn.big{width:100%;flex:none;margin-bottom:14px;text-decoration:none}
+.stop{width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px;flex:none;margin-right:10px}
+.ch{align-items:center}
+.qa{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.qa a{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:16px;background:var(--bg);border:1px solid var(--line);font-size:12.5px;font-weight:600;color:var(--tint-ink)}
+.qa .i{width:20px;height:20px}
+.warnl,.tagl{display:flex;gap:10px;align-items:center;border-radius:14px;padding:10px 12px;font-size:14px;font-weight:500}
+.warnl{background:var(--warn-bg);color:var(--warn)}.tagl{background:var(--ok-bg);color:var(--ok)}
+.warnl .i,.tagl .i{width:18px;height:18px}
+.move{display:flex;justify-content:flex-end;gap:8px;margin-top:-4px}
+.move button{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--card);display:grid;place-items:center;cursor:pointer;color:var(--muted)}
+.move .i{width:18px;height:18px}
+.sum{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.sum div{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;box-shadow:var(--shadow)}
+.sum b{display:block;font-size:24px;font-weight:700;letter-spacing:-.01em}
+.sum span{font-size:13.5px;color:var(--muted)}
+.lab{display:block;font-size:14px;font-weight:600;color:var(--muted);margin:4px 0 8px}
+.inp{width:100%;height:52px;border:2px solid var(--line);border-radius:16px;background:var(--card);padding:0 14px;font-size:16px;outline:none;margin-bottom:12px}
+.inp:focus{border-color:var(--navy-2)}
+.cas{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 12px;margin-bottom:12px}
+.cas > span:first-child{display:flex;gap:10px;align-items:center}.cas small{display:block;color:var(--muted);font-size:13px}
+.stp{display:flex;align-items:center;gap:10px}.stp button{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--bg);font-size:20px;cursor:pointer}.stp b{min-width:20px;text-align:center;font-size:18px}
+.photo{display:flex;gap:10px;align-items:center;margin-bottom:14px}.photo img{width:64px;height:64px;border-radius:14px;object-fit:cover}
+.reasons{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.sheet{max-height:calc(100% - var(--st) - 20px);overflow-y:auto}
 .toast{position:fixed;left:50%;bottom:calc(24px + var(--sb));transform:translateX(-50%);z-index:60;background:var(--navy);color:#fff;border-radius:999px;padding:12px 18px;font-weight:600;font-size:14.5px;display:flex;gap:8px;align-items:center;white-space:nowrap;box-shadow:var(--shadow)}
 .toast .i{width:16px;height:16px;color:var(--orange)}
 button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
@@ -98,19 +123,39 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 <body>
 <main class="w" id="app"></main>
 <div id="layer"></div>
-<script src="../data/store.js?v=13"></script>
+<input type="file" id="pfile" accept="image/*" capture="environment" hidden>
+<script src="../data/store.js?v=14"></script>
 <script>
 const D=window.DBCStore, $=id=>document.getElementById(id);
 const brl=n=>(+n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const LOCKUP = `<svg viewBox="-6 -6 580 232" role="img" aria-label="DBC Gases e Locações"><defs><clipPath id="sq"><rect x="0" y="0" width="200" height="145"/></clipPath></defs><rect x="0" y="0" width="200" height="145" fill="#F28A26"/><g clip-path="url(#sq)" fill="none" stroke-linecap="round"><path d="M4 168 L58 92" stroke="#00213F" stroke-width="30"/><path d="M54 98 L74 72" stroke="#00213F" stroke-width="19"/><path d="M70 76 Q112 34 178 22" stroke="#00213F" stroke-width="8"/><path d="M26 150 L60 103" stroke="#FFFFFF" stroke-opacity=".28" stroke-width="3"/><path d="M176 22 L186 20" stroke="#FFFFFF" stroke-width="7"/></g><rect x="1.5" y="1.5" width="197" height="142" fill="none" stroke="#FFFFFF" stroke-width="3"/><g fill="#1E95D3"  transform="translate(206.21 145) scale(0.08439 -0.09732)"><path transform="translate(0 0)" d="M664 0C1117 0 1397 280 1397 745C1397 1210 1117 1490 664 1490H116V0ZM469 302V1188H644C905 1188 1044 1068 1044 745C1044 422 905 302 649 302Z"/><path transform="translate(1480 0)" d="M116 0H780C1110 0 1297 176 1297 416C1297 632 1141 767 962 774V790C1124 823 1239 941 1239 1112C1239 1337 1067 1490 734 1490H116ZM469 285V647H704C843 647 929 572 929 456C929 350 855 285 697 285ZM469 876V1208H680C802 1208 879 1145 879 1045C879 938 793 876 674 876Z"/><path transform="translate(2841 0)" d="M787 -20C1192 -20 1419 260 1446 526H1089C1064 381 954 290 794 290C580 290 443 445 443 744C443 1033 577 1200 796 1200C956 1200 1065 1109 1088 964H1445C1404 1311 1141 1510 787 1510C390 1510 82 1236 82 744C82 255 384 -20 787 -20Z"/></g><g fill="#F28A26" stroke="#FFFFFF" stroke-width="0"  transform="translate(5.56 212) scale(0.02686 -0.02953)"><path transform="translate(0 0)" d="M726 -20C1105 -20 1413 205 1480 613L1516 832H856L809 544H1078C1047 420 931 332 747 332C582 332 503 428 503 600C503 866 645 1158 927 1158C1043 1158 1110 1100 1118 998H1526C1546 1315 1273 1510 936 1510C435 1510 91 1096 91 597C91 213 335 -20 726 -20Z"/><path transform="translate(1546 0)" d="M-47 0H421L550 286H1009L1047 0H1489L1235 1490H683ZM686 588C768 770 843 965 916 1159C929 965 945 770 969 588Z"/><path transform="translate(3174 0)" d="M630 -18C1007 -18 1237 145 1286 440C1323 666 1213 825 895 896L778 922C642 952 589 993 601 1064C612 1130 675 1178 800 1178C931 1178 984 1121 975 1024H1363C1409 1316 1192 1510 831 1510C477 1510 221 1319 175 1036C136 803 275 672 529 616L674 584C833 549 885 507 874 440C862 366 784 314 655 314C499 314 420 387 436 524H52C-8 150 241 -18 630 -18Z"/><path transform="translate(4538 0)" d="M3 0H1073L1127 326H461L505 594H1119L1172 912H558L600 1164H1270L1324 1490H250Z"/><path transform="translate(5812 0)" d="M630 -18C1007 -18 1237 145 1286 440C1323 666 1213 825 895 896L778 922C642 952 589 993 601 1064C612 1130 675 1178 800 1178C931 1178 984 1121 975 1024H1363C1409 1316 1192 1510 831 1510C477 1510 221 1319 175 1036C136 803 275 672 529 616L674 584C833 549 885 507 874 440C862 366 784 314 655 314C499 314 420 387 436 524H52C-8 150 241 -18 630 -18Z"/><path transform="translate(7584 0)" d="M3 0H1073L1127 326H461L505 594H1119L1172 912H558L600 1164H1270L1324 1490H250Z"/><path transform="translate(9266 0)" d="M3 0H1009L1063 326H461L654 1490H250Z"/><path transform="translate(10424 0)" d="M720 -20C1229 -20 1560 393 1560 892C1560 1292 1297 1510 932 1510C421 1510 91 1096 91 597C91 199 352 -20 720 -20ZM737 332C581 332 502 421 502 594C502 844 624 1158 915 1158C1071 1158 1149 1069 1149 896C1149 644 1028 332 737 332Z"/><path transform="translate(12014 0)" d="M714 -20C1140 -20 1403 290 1465 544H1055C1014 417 899 332 741 332C586 332 502 418 502 595C502 851 635 1158 921 1158C1060 1158 1124 1073 1119 946H1529C1551 1310 1300 1510 926 1510C418 1510 91 1093 91 594C91 197 345 -20 714 -20Z"/><path transform="translate(13546 0)" d="M-47 0H421L550 286H1009L1047 0H1489L1235 1490H683ZM686 588C768 770 843 965 916 1159C929 965 945 770 969 588Z"/><path transform="translate(15174 0)" d="M477 -412H635C808 -412 889 -364 910 -236C927 -132 856 -68 730 -84L749 -19C1154 -3 1405 297 1465 544H1055C1014 417 899 332 741 332C586 332 502 418 502 595C502 851 635 1158 921 1158C1060 1158 1124 1073 1119 946H1529C1551 1310 1300 1510 926 1510C418 1510 91 1093 91 594C91 236 297 25 608 -14L553 -166H653C709 -166 730 -183 723 -223C716 -263 689 -281 633 -281H498Z"/><path transform="translate(16706 0)" d="M720 -20C1229 -20 1560 393 1560 892C1560 1292 1297 1510 932 1510C421 1510 91 1096 91 597C91 199 352 -20 720 -20ZM737 332C581 332 502 421 502 594C502 844 624 1158 915 1158C1071 1158 1149 1069 1149 896C1149 644 1028 332 737 332ZM1120 1628C1256 1628 1383 1736 1420 1942H1224C1210 1872 1184 1831 1128 1831C1059 1831 1027 1948 877 1948C739 1948 616 1846 577 1636H775C790 1709 823 1748 870 1748C944 1748 968 1628 1120 1628Z"/><path transform="translate(18296 0)" d="M3 0H1073L1127 326H461L505 594H1119L1172 912H558L600 1164H1270L1324 1490H250Z"/><path transform="translate(19570 0)" d="M630 -18C1007 -18 1237 145 1286 440C1323 666 1213 825 895 896L778 922C642 952 589 993 601 1064C612 1130 675 1178 800 1178C931 1178 984 1121 975 1024H1363C1409 1316 1192 1510 831 1510C477 1510 221 1319 175 1036C136 803 275 672 529 616L674 584C833 549 885 507 874 440C862 366 784 314 655 314C499 314 420 387 436 524H52C-8 150 241 -18 630 -18Z"/></g></svg>`;
-const I={pin:'<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',truck:'<path d="M3 6h11v10H3zM14 9h4l3 3v4h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/>',check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',box:'<path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>'};
+const I={pin:'<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',truck:'<path d="M3 6h11v10H3zM14 9h4l3 3v4h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/>',check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',box:'<path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>',
+  nav:'<path d="M3 11l18-8-8 18-2-8z"/>',wa:'<path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 .8a4 4 0 0 1-1.8-1.8l.8-1-1-2z"/>',up:'<path d="M6 15l6-6 6 6"/>',down:'<path d="M6 9l6 6 6-6"/>',cam:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',warn:'<path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17v.01"/>',cyl:'<rect x="7" y="6" width="10" height="16" rx="4"/><path d="M10 6V3h4v3M9 2h6"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',route:'<circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.5"/>'};
 const svg=(k,sw=1.8)=>`<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[k]}</svg>`;
 const SHIP_L={moto:'Moto',truck:'Caminhonete'};
-const S={f:'ready',sheet:null,err:''};
+const STORE='Rua Vinte de Maio, 320, Piedade - SP';
+const S={f:'ready',sheet:null,err:'',pf:{}};
 const FROM=(new URLSearchParams(location.search).get('from')==='v1')?'../':'../v2/';
-const OK_K='dbc.courier.pin';
+const OK_K='dbc.courier.pin', ORD_K='dbc.courier.stops';
+const hm=iso=>iso?new Date(iso).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'';
+const isToday=iso=>iso&&new Date(iso).toDateString()===new Date().toDateString();
+const digits=s=>String(s||'').replace(/\D/g,'');
+const gmaps=a=>'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(a);
+const waze=a=>'https://waze.com/ul?q='+encodeURIComponent(a)+'&navigate=yes';
+const F={
+  ready:['Para sair',o=>o.status===2],
+  route:['Em rota',o=>o.status===3],
+  prep:['Em separação',o=>o.status===0||o.status===1],
+  done:['Hoje',o=>o.status===4&&isToday(o.history[4])]
+};
+function toast(m){const d=document.createElement('div');d.className='toast';d.innerHTML=svg('check',3)+esc(m);document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
 function authed(){try{return D.checkCourierPin(localStorage.getItem(OK_K)||'')}catch(_){return false}}
+function stops(){try{return JSON.parse(localStorage.getItem(ORD_K)||'[]')}catch(_){return []}}
+function saveStops(l){try{localStorage.setItem(ORD_K,JSON.stringify(l))}catch(_){}}
+function routeList(all){const st=stops(),l=all.filter(F.route[1]);return l.sort((a,b)=>{const ia=st.indexOf(a.no),ib=st.indexOf(b.no);return (ia<0?999:ia)-(ib<0?999:ib)||(a.history[3]||'').localeCompare(b.history[3]||'')})}
+function items(o){return o.items.reduce((a,i)=>a+i[2],0)}
+function goOut(nos){const st=stops().filter(n=>!nos.includes(n));nos.forEach(n=>{D.setStatus(n,3,'entregador');st.push(n)});saveStops(st);S.f='route';render();toast(nos.length>1?`Saída de ${nos.length} pedidos registrada`:'Saída registrada. Boa entrega!')}
 function gate(){
   $('app').innerHTML=`<section class="gate"><div class="brand"><span class="lg">${LOCKUP}</span>Entregas</div>
     <h1>Modo entregador</h1><p>Digite a senha de 4 números que a loja passou.</p>
@@ -118,73 +163,114 @@ function gate(){
     <div class="code" style="margin:0">${[0,1,2,3].map(i=>`<input inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Número ${i+1}" data-pi="${i}">`).join('')}</div>
     <button class="btn" data-login style="flex:none">Entrar</button>
     <div class="links"><a href="${FROM}">← Voltar ao app de vendas</a></div></section>`;
-  const ins=[...document.querySelectorAll('[data-pi]')];ins[0].focus();
-  ins.forEach((inp,i)=>{inp.addEventListener('input',()=>{inp.value=inp.value.replace(/\D/g,'').slice(-1);if(inp.value&&ins[i+1])ins[i+1].focus();if(ins.every(x=>x.value))login()});inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!inp.value&&ins[i-1])ins[i-1].focus()})});
+  codeInputs('[data-pi]',login);
+}
+function codeInputs(sel,done){
+  const ins=[...document.querySelectorAll(sel)];if(ins[0])ins[0].focus();
+  ins.forEach((inp,i)=>{inp.addEventListener('input',()=>{inp.value=inp.value.replace(/\D/g,'').slice(-1);if(inp.value&&ins[i+1])ins[i+1].focus();if(done&&ins.every(x=>x.value))done()});
+    inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!inp.value&&ins[i-1])ins[i-1].focus()});
+    inp.addEventListener('paste',e=>{const t=digits(e.clipboardData.getData('text')).slice(0,ins.length);if(t.length===ins.length){e.preventDefault();t.split('').forEach((c,j)=>ins[j].value=c);if(done)done()}})});
 }
 function login(){const v=[...document.querySelectorAll('[data-pi]')].map(x=>x.value).join('');if(D.checkCourierPin(v)){try{localStorage.setItem(OK_K,v)}catch(_){}S.err='';render()}else{S.err='Senha incorreta.';gate()}}
-const hm=iso=>iso?new Date(iso).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'';
-const isToday=iso=>iso&&new Date(iso).toDateString()===new Date().toDateString();
-const F={
-  ready:['Para sair',o=>o.status===2],
-  route:['Em rota',o=>o.status===3],
-  prep:['Em separação',o=>o.status===0||o.status===1],
-  done:['Entregues hoje',o=>o.status===4&&isToday(o.history[4])]
-};
-function toast(m){const d=document.createElement('div');d.className='toast';d.innerHTML=svg('check',3)+esc(m);document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
-function items(o){return o.items.reduce((a,i)=>a+i[2],0)}
-function card(o){
+function contact(o){const tel=digits(D.phoneOf(o)),a=D.addrOf(o);
+  return `<div class="qa"><a href="${gmaps(a)}" target="_blank" rel="noopener">${svg('nav',2)}Maps</a><a href="${waze(a)}" target="_blank" rel="noopener">${svg('route',2)}Waze</a>
+    <a href="https://wa.me/55${tel}?text=${encodeURIComponent(`Olá! Aqui é o entregador da DBC Gases. Estou a caminho com o pedido #${o.no}.`)}" target="_blank" rel="noopener">${svg('wa',2)}WhatsApp</a><a href="tel:+55${tel}">${svg('phone',2)}Ligar</a></div>`}
+function card(o,i,n){
   const st={0:['Na loja','wait'],1:['Separando','wait'],2:['Pronto para sair','rd'],3:['Em rota','go'],4:['Entregue','ok']}[o.status];
-  const maps='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(D.addrOf(o));
+  const cas=D.cascosFor(o), last=(o.issues||[]).slice(-1)[0];
   return `<article class="card">
-    <div class="ch"><span><b>#${o.no} · ${esc(o.customer||'Cliente')}</b><small>${items(o)} ${items(o)===1?'item':'itens'} · ${SHIP_L[o.ship]||''} · ${brl(D.totals(o).total)} · pago</small></span><span class="st ${st[1]}">${st[0]}</span></div>
-    <a class="addr" href="${maps}" target="_blank" rel="noopener">${svg('pin',2)}<span>${esc(D.addrOf(o))}</span></a>
-    <div class="meta">${o.status>=3&&o.history[3]?`<span>Saiu às ${hm(o.history[3])}</span>`:''}${o.status===4?`<span>Entregue às ${hm(o.history[4])}</span>`:''}</div>
-    ${o.status===2?`<div class="acts"><a class="btn ghost" href="tel:+55${D.phoneOf(o).replace(/\D/g,'')}" aria-label="Ligar para o cliente">${svg('phone',2)}</a><button class="btn or" data-out="${o.no}">${svg('truck',2)}Saí para entrega</button></div>`:''}
-    ${o.status===3?`<div class="acts"><a class="btn ghost" href="tel:+55${D.phoneOf(o).replace(/\D/g,'')}" aria-label="Ligar para o cliente">${svg('phone',2)}</a><button class="btn" data-deliver="${o.no}">${svg('check',2.4)}Confirmar entrega</button></div>`:''}
+    <div class="ch">${o.status===3?`<span class="stop">${i+1}</span>`:''}<span style="flex:1;min-width:0"><b>#${o.no} · ${esc(o.customer||'Cliente')}</b><small>${items(o)} ${items(o)===1?'item':'itens'} · ${SHIP_L[o.ship]||''} · ${brl(D.totals(o).total)} · pago</small></span><span class="st ${st[1]}">${st[0]}</span></div>
+    ${last&&o.status<4?`<div class="warnl">${svg('warn',2)}<span>Tentativa às ${hm(last.t)}: ${esc(last.reason)}${last.note?' · '+esc(last.note):''}</span></div>`:''}
+    <a class="addr" href="${gmaps(D.addrOf(o))}" target="_blank" rel="noopener">${svg('pin',2)}<span>${esc(D.addrOf(o))}</span></a>
+    ${cas&&o.status<4?`<div class="tagl">${svg('cyl',1.8)}Troca de cilindro: recolher ${cas} ${cas===1?'casco vazio':'cascos vazios'}</div>`:''}
+    ${o.status===3?contact(o):''}
+    ${o.status===4?`<div class="meta"><span>Entregue às ${hm(o.history[4])}</span>${o.proof&&o.proof.name?`<span>Recebido por ${esc(o.proof.name)}</span>`:''}${o.proof&&o.proof.cascos?`<span>${o.proof.cascos} ${o.proof.cascos===1?'casco':'cascos'} recolhido${o.proof.cascos===1?'':'s'}</span>`:''}${o.proof&&o.proof.photo?'<span>com foto</span>':''}</div>`:''}
+    ${o.status===2?`<div class="acts"><a class="btn ghost" href="tel:+55${digits(D.phoneOf(o))}" aria-label="Ligar para o cliente">${svg('phone',2)}</a><button class="btn or" data-out="${o.no}">${svg('truck',2)}Saí para entrega</button></div>`:''}
+    ${o.status===3?`<div class="acts"><button class="btn ghost wide" data-issue="${o.no}">Não consegui</button><button class="btn" data-deliver="${o.no}">${svg('check',2.4)}Entregar</button></div>
+      <div class="move">${i>0?`<button data-mv="${o.no}" data-d="-1" aria-label="Subir na rota">${svg('up',2)}</button>`:''}${i<n-1?`<button data-mv="${o.no}" data-d="1" aria-label="Descer na rota">${svg('down',2)}</button>`:''}</div>`:''}
   </article>`;
+}
+function summary(all){
+  const d=all.filter(F.done[1]), val=d.reduce((a,o)=>a+D.totals(o).total,0), cas=d.reduce((a,o)=>a+((o.proof&&o.proof.cascos)||0),0);
+  const iss=D.orders().reduce((a,o)=>a+(o.issues||[]).filter(x=>isToday(x.t)).length,0);
+  const t=d.map(o=>o.history[4]).sort();
+  return `<section class="sum"><div><b>${d.length}</b><span>${d.length===1?'entrega':'entregas'}</span></div><div><b>${brl(val)}</b><span>em pedidos</span></div><div><b>${cas}</b><span>${cas===1?'casco recolhido':'cascos recolhidos'}</span></div><div><b>${iss}</b><span>${iss===1?'ocorrência':'ocorrências'}</span></div></section>
+    ${t.length?`<p class="sub" style="margin:10px 2px 14px">Primeira às ${hm(t[0])} · última às ${hm(t[t.length-1])}</p>`:''}`;
 }
 function render(){
   if(!authed())return gate();
-  const all=D.orders().filter(o=>o.ship!=='pickup'&&o.status!==-1), c=k=>all.filter(F[k][1]).length, list=all.filter(F[S.f][1]);
+  const all=D.orders().filter(o=>o.ship!=='pickup'&&o.status!==-1), c=k=>all.filter(F[k][1]).length;
+  let list=S.f==='route'?routeList(all):all.filter(F[S.f][1]);
   if(S.f==='ready')list.sort((a,b)=>(a.history[2]||'').localeCompare(b.history[2]||''));
+  if(S.f==='done')list.sort((a,b)=>(b.history[4]||'').localeCompare(a.history[4]||''));
+  const rt=routeList(all), full=rt.length?'https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(STORE)+'&destination='+encodeURIComponent(D.addrOf(rt[rt.length-1]))+(rt.length>1?'&waypoints='+encodeURIComponent(rt.slice(0,-1).map(D.addrOf).join('|')):''):'';
   $('app').innerHTML=`<section class="top"><div class="brand"><span class="lg">${LOCKUP}</span>Entregas</div>
     <h1 class="hello">Suas entregas</h1><p class="sub">${new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'})}</p></section>
-    <section class="hero">${['ready','route','done'].map(k=>`<button class="stat" data-f="${k}" aria-pressed="${S.f===k}"><b>${c(k)}</b><span>${F[k][0]}</span></button>`).join('')}</section>
+    <section class="hero">${['ready','route','done'].map(k=>`<button class="stat" data-f="${k}" aria-pressed="${S.f===k}"><b>${c(k)}</b><span>${k==='done'?'Entregues hoje':F[k][0]}</span></button>`).join('')}</section>
     <div class="chips">${Object.entries(F).map(([k,[l]])=>`<button class="chip" data-f="${k}" aria-pressed="${S.f===k}">${l} (${c(k)})</button>`).join('')}</div>
-    ${list.length?list.map(card).join(''):`<div class="empty">${{ready:'Nenhum pedido pronto para sair agora.',route:'Nenhuma entrega em rota.',prep:'Nada em separação na loja.',done:'Nenhuma entrega concluída hoje.'}[S.f]}</div>`}
-    <p class="note">Peça ao cliente o código de 4 números que aparece no app dele.<br>Problema na entrega? Ligue para a loja: <a href="tel:+551533442737"><b>(15) 3344-2737</b></a></p>
+    ${S.f==='ready'&&list.length>1?`<button class="btn or big" data-outall>${svg('truck',2)}Sair com todos (${list.length})</button>`:''}
+    ${S.f==='route'&&list.length?`<a class="btn big" href="${full}" target="_blank" rel="noopener">${svg('route',2)}Abrir rota completa no Maps (${list.length} ${list.length===1?'parada':'paradas'})</a>`:''}
+    ${S.f==='done'?summary(all):''}
+    ${list.length?list.map((o,i)=>card(o,i,list.length)).join(''):`<div class="empty">${{ready:'Nenhum pedido pronto para sair agora.',route:'Nenhuma entrega em rota.',prep:'Nada em separação na loja.',done:'Nenhuma entrega concluída hoje.'}[S.f]}</div>`}
+    <p class="note">Na entrega, peça ao cliente o código de 4 números que aparece no app dele.<br>Problema? Ligue para a loja: <a href="tel:+551533442737"><b>(15) 3344-2737</b></a></p>
     <div class="links"><a href="${FROM}">← App de vendas</a>${(sy=>`<span class="sync${sy.on&&!sy.error?' on':''}"><i></i>${sy.mode==='firebase'?(sy.on&&!sy.error?'Ligado à loja':'Sem conexão'):'Só neste aparelho'}</span>`)(D.syncStatus())}<button data-logout>Sair</button></div>`;
 }
+function resize(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const m=640,k=Math.min(1,m/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.6))};img.onerror=rej;img.src=r.result};r.onerror=rej;r.readAsDataURL(file)})}
+function readPF(){const P=S.pf;const n=$('rname');if(n)P.name=n.value;const code=[...document.querySelectorAll('[data-ci]')].map(x=>x.value);if(code.length)P.code=code}
 function sheet(){
   const el=$('layer');
-  if(!S.sheet){el.innerHTML='';return}
-  const o=D.order(S.sheet);
+  if(!S.sheet){el.innerHTML='';document.body.style.overflow='';return}
+  document.body.style.overflow='hidden';
+  const o=D.order(S.sheet.no), P=S.pf;
+  if(S.sheet.kind==='issue'){
+    el.innerHTML=`<div class="scrim" data-close></div><section class="sheet" role="dialog" aria-modal="true" aria-label="Não consegui entregar"><div class="grab"></div>
+      <h2>Não consegui entregar</h2><p>Pedido #${o.no} · ${esc(o.customer||'')}. A loja recebe o aviso e o pedido volta para "Para sair".</p>
+      ${S.err?`<div class="err">${esc(S.err)}</div>`:''}
+      <div class="reasons">${D.ISSUES.map(r=>`<button class="chip" data-reason="${esc(r)}" aria-pressed="${P.reason===r}">${esc(r)}</button>`).join('')}</div>
+      <input class="inp" id="inote" placeholder="Observação (opcional)" value="${esc(P.note||'')}">
+      <div class="acts"><button class="btn ghost wide" data-close>Voltar</button><button class="btn or" data-issueok>Avisar a loja</button></div></section>`;
+    return;
+  }
+  const cas=D.cascosFor(o);
   el.innerHTML=`<div class="scrim" data-close></div><section class="sheet" role="dialog" aria-modal="true" aria-label="Confirmar entrega"><div class="grab"></div>
-    <h2>Código de entrega</h2><p>Pedido #${o.no} · ${esc(o.customer||'')}. Peça ao cliente o código que aparece no app.</p>
+    <h2>Entregar pedido #${o.no}</h2><p>${esc(o.customer||'')} · ${esc(D.addrOf(o))}</p>
     ${S.err?`<div class="err">${esc(S.err)}</div>`:''}
-    <div class="code">${[0,1,2,3].map(i=>`<input inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Número ${i+1}" data-ci="${i}">`).join('')}</div>
-    <div class="acts"><button class="btn ghost wide" data-close>Voltar</button><button class="btn or" data-confirm>${svg('check',2.4)}Confirmar</button></div></section>`;
-  const ins=[...el.querySelectorAll('[data-ci]')];ins[0].focus();
-  ins.forEach((inp,i)=>{inp.addEventListener('input',()=>{inp.value=inp.value.replace(/\D/g,'').slice(-1);if(inp.value&&ins[i+1])ins[i+1].focus();if(ins.every(x=>x.value))confirm()});
-    inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!inp.value&&ins[i-1])ins[i-1].focus()});
-    inp.addEventListener('paste',e=>{const t=(e.clipboardData.getData('text')||'').replace(/\D/g,'').slice(0,4);if(t.length===4){e.preventDefault();t.split('').forEach((c,j)=>ins[j].value=c);confirm()}})});
+    <label class="lab">Código de entrega (o cliente vê no app)</label>
+    <div class="code">${[0,1,2,3].map(i=>`<input inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Número ${i+1}" data-ci="${i}" value="${esc((P.code||[])[i]||'')}">`).join('')}</div>
+    <label class="lab" for="rname">Quem recebeu</label>
+    <input class="inp" id="rname" placeholder="Nome de quem recebeu" value="${esc(P.name||'')}" autocomplete="off">
+    ${cas?`<div class="cas"><span>${svg('cyl',1.8)}<span><b>Cascos vazios recolhidos</b><small>Esperado: ${cas}</small></span></span><span class="stp"><button data-cas="-1" aria-label="Menos">−</button><b>${P.cascos}</b><button data-cas="1" aria-label="Mais">+</button></span></div>`:''}
+    <div class="photo">${P.photo?`<img src="${P.photo}" alt="Foto da entrega"><button class="btn ghost wide" data-nophoto>Tirar outra</button>`:`<button class="btn ghost wide" data-photo>${svg('cam',2)}Foto da entrega (opcional)</button>`}</div>
+    <div class="acts"><button class="btn ghost wide" data-close>Voltar</button><button class="btn or" data-confirm>${svg('check',2.4)}Confirmar entrega</button></div></section>`;
+  codeInputs('[data-ci]',null);
+  if((P.code||[]).join('').length===4)$('rname').focus();
 }
-function confirm(){
-  const code=[...document.querySelectorAll('[data-ci]')].map(x=>x.value).join('');
-  if(code.length<4){S.err='Digite os 4 números.';return sheet()}
-  if(D.confirmDelivery(S.sheet,code,'entregador')){const no=S.sheet;S.sheet=null;S.err='';sheet();S.f='done';render();toast('Pedido #'+no+' entregue')}
-  else{S.err='Código não confere. Confira com o cliente.';sheet()}
+function confirmDel(){
+  readPF();const P=S.pf, code=(P.code||[]).join('');
+  if(code.length<4){S.err='Digite os 4 números do código.';return sheet()}
+  if(!String(P.name||'').trim()){S.err='Informe o nome de quem recebeu.';return sheet()}
+  const no=S.sheet.no;
+  if(D.confirmDelivery(no,code,'entregador',{name:P.name.trim(),photo:P.photo||null,cascos:P.cascos||0})){S.sheet=null;S.err='';saveStops(stops().filter(n=>n!==no));sheet();render();toast('Pedido #'+no+' entregue')}
+  else{S.err='Código não confere. Confira com o cliente.';P.code=[];sheet()}
 }
 document.addEventListener('click',e=>{
   const b=e.target.closest('button,.scrim');if(!b)return;const d=b.dataset;
   if('f' in d){S.f=d.f;return render()}
-  if('out' in d){D.setStatus(d.out,3,'entregador');toast('Saída registrada. Boa entrega!');S.f='route';return render()}
-  if('deliver' in d){S.sheet=d.deliver;S.err='';return sheet()}
+  if('out' in d)return goOut([d.out]);
+  if('outall' in d)return goOut(D.orders().filter(o=>o.ship!=='pickup'&&o.status===2).sort((x,y)=>(x.history[2]||'').localeCompare(y.history[2]||'')).map(o=>o.no));
+  if('mv' in d){const all=D.orders().filter(o=>o.ship!=='pickup'&&o.status!==-1),l=routeList(all).map(o=>o.no),i=l.indexOf(d.mv),j=i+ +d.d;if(j<0||j>=l.length)return;[l[i],l[j]]=[l[j],l[i]];saveStops(l);return render()}
+  if('deliver' in d){const o=D.order(d.deliver);S.sheet={kind:'deliver',no:d.deliver};S.pf={cascos:D.cascosFor(o),code:[]};S.err='';return sheet()}
+  if('issue' in d){S.sheet={kind:'issue',no:d.issue};S.pf={};S.err='';return sheet()}
+  if('reason' in d){S.pf.note=($('inote')||{}).value||'';S.pf.reason=d.reason;return sheet()}
+  if('issueok' in d){const note=($('inote')||{}).value||'';if(!S.pf.reason){S.pf.note=note;S.err='Escolha o motivo.';return sheet()}const no=S.sheet.no;D.deliveryIssue(no,S.pf.reason,note.trim(),'entregador');saveStops(stops().filter(n=>n!==no));S.sheet=null;S.err='';sheet();S.f='ready';render();return toast('Loja avisada')}
+  if('cas' in d){readPF();S.pf.cascos=Math.max(0,(S.pf.cascos||0)+ +d.cas);return sheet()}
+  if('photo' in d||'nophoto' in d){readPF();const f=$('pfile');f.value='';return f.click()}
   if('close' in d){S.sheet=null;S.err='';return sheet()}
-  if('confirm' in d)return confirm();
+  if('confirm' in d)return confirmDel();
   if('login' in d)return login();
   if('logout' in d){try{localStorage.removeItem(OK_K)}catch(_){}return render()}
 });
+$('pfile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{S.pf.photo=await resize(f);sheet()}catch(_){toast('Não deu para usar essa foto')}});
 D.onChange(()=>{if(!document.querySelector('[data-pi]'))render()});
 render();
 </script>
