@@ -22,3 +22,10 @@ basta trocar o objeto `adapter` dentro de `data/store.js`.
 https://marceloafg1-alt.github.io/elvis-app/entregador/ lista as entregas prontas, registra "Saí para entrega"
 e confirma a entrega com o código de 4 números que o cliente vê no app. Pagamento e nota fiscal são automáticos;
 separação, saída e entrega são marcadas no painel ou pelo entregador.
+
+### Entregador dentro do app de vendas e avisos no painel
+
+Nos apps de venda, em Perfil/Conta, "Sou entregador" abre o modo entregador (senha de 4 números definida no painel,
+em Planilha e dados; padrão 1234). Cada ação do entregador vira um aviso no painel (sininho, alerta na tela e notificação
+do aparelho). Para funcionar entre celulares diferentes, preencha `FIREBASE` em `data/store.js` com a configuração do
+app web do Firebase (Firestore); sem isso, os dados ficam só no navegador.

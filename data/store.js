@@ -9,13 +9,48 @@
  */
 (function(){
   var SEED = {"cats": [{"id": "solda", "name": "Soldagem"}, {"id": "gas", "name": "Gases"}, {"id": "eletricas", "name": "Elétricas"}, {"id": "fixacao", "name": "Parafusos e rebites"}, {"id": "abrasivos", "name": "Discos"}, {"id": "epi", "name": "EPI"}, {"id": "ferragens", "name": "Ferragens"}, {"id": "manuais", "name": "Manuais"}], "products": [{"active": true, "top": true, "gas": false, "tag": "", "id": "inv160", "cat": "solda", "sub": "Máquinas", "name": "Inversora de solda MMA 160 A bivolt", "brand": "Linha profissional", "sku": "SD-160MMA", "unit": "un", "stock": 6, "vars": [{"l": "160 A", "p": 689.9}, {"l": "200 A", "p": 899, "s": "até eletrodo 4,0 mm"}], "specs": [["Corrente", "20 a 160 A"], ["Tensão", "127 / 220 V automático"], ["Eletrodo", "até 3,25 mm"], ["Ciclo de trabalho", "60% a 160 A"], ["Garantia", "12 meses"]]}, {"active": true, "top": false, "gas": false, "tag": "", "id": "mig200", "cat": "solda", "sub": "Máquinas", "name": "Máquina MIG/MAG 200 A com e sem gás", "brand": "Linha profissional", "sku": "SD-MIG200", "unit": "un", "stock": 3, "vars": [{"l": "200 A", "p": 2390}], "specs": [["Arame", "0,6 a 1,0 mm"], ["Tensão", "220 V"], ["Modo", "MIG, MAG, arame tubular e eletrodo"], ["Garantia", "12 meses"]]}, {"active": true, "top": true, "gas": false, "tag": "", "id": "e6013", "cat": "solda", "sub": "Consumíveis", "name": "Eletrodo revestido E6013", "brand": "Consumível", "sku": "EL-6013", "unit": "kg", "stock": 180, "vars": [{"l": "2,5 mm", "p": 32.9}, {"l": "3,25 mm", "p": 31.5}, {"l": "4,0 mm", "p": 30.9}], "specs": [["Norma", "AWS A5.1 E6013"], ["Posição", "todas"], ["Corrente", "CA ou CC"], ["Venda", "por kg (lata de 5 kg ou avulso)"]]}, {"active": true, "top": false, "gas": false, "tag": "", "id": "er70", "cat": "solda", "sub": "Consumíveis", "name": "Arame MIG ER70S-6 cobreado, rolo 15 kg", "brand": "Consumível", "sku": "AR-ER70S6", "unit": "rolo", "stock": 22, "vars": [{"l": "0,8 mm", "p": 389}, {"l": "1,0 mm", "p": 379}], "specs": [["Norma", "AWS A5.18 ER70S-6"], ["Gás indicado", "Ar/CO₂ (C25) ou CO₂"], ["Peso", "15 kg"]]}, {"active": true, "top": true, "gas": true, "tag": "Recarga", "id": "c25", "cat": "gas", "sub": "Gás para MIG", "name": "Gás Ar/CO₂ C25 para solda MIG, cilindro 10 m³", "brand": "Gás industrial", "sku": "GS-C25-10", "unit": "cilindro", "stock": 14, "vars": [{"l": "Recarga", "s": "troca pelo seu casco", "p": 289}, {"l": "Cilindro novo + gás", "s": "cilindro de aço próprio", "p": 1890}], "specs": [["Mistura", "75% argônio + 25% CO₂"], ["Volume", "10 m³ (≈ 9 kg)"], ["Válvula", "padrão CGA 580"], ["Transporte", "somente caminhonete, em pé e amarrado"]]}, {"active": true, "top": false, "gas": true, "tag": "", "id": "o2", "cat": "gas", "sub": "Oxicorte", "name": "Oxigênio industrial, cilindro 10 m³", "brand": "Gás industrial", "sku": "GS-O2-10", "unit": "cilindro", "stock": 9, "vars": [{"l": "Recarga", "s": "troca do casco", "p": 159}, {"l": "Cilindro novo + gás", "p": 1490}], "specs": [["Pureza", "99,5%"], ["Volume", "10 m³"], ["Transporte", "somente caminhonete"]]}, {"active": true, "top": true, "gas": false, "tag": "10x sem juros", "id": "df333", "cat": "eletricas", "sub": "Parafusadeiras", "name": "Parafusadeira e furadeira Makita 12 V DF333DWYE", "brand": "Makita", "sku": "MK-DF333", "unit": "un", "stock": 5, "vars": [{"l": "2 baterias + maleta", "p": 899}], "specs": [["Bateria", "12 V Li-ion, 1,5 Ah (2 un)"], ["Torque", "30 N·m"], ["Mandril", "3/8\" (10 mm)"], ["Garantia", "12 meses Makita"]]}, {"active": true, "top": false, "gas": false, "tag": "", "id": "ga4530", "cat": "eletricas", "sub": "Esmerilhadeiras", "name": "Esmerilhadeira angular Makita 4.1/2\" 720 W GA4530", "brand": "Makita", "sku": "MK-GA4530", "unit": "un", "stock": 8, "vars": [{"l": "127 V", "p": 349}, {"l": "220 V", "p": 349}], "specs": [["Disco", "4.1/2\" (115 mm)"], ["Potência", "720 W"], ["Rotação", "11.000 rpm"]]}, {"active": true, "top": false, "gas": false, "tag": "", "id": "fur650", "cat": "eletricas", "sub": "Furadeiras", "name": "Furadeira de impacto 1/2\" 650 W", "brand": "Linha profissional", "sku": "FD-650", "unit": "un", "stock": 11, "vars": [{"l": "127 V", "p": 289}, {"l": "220 V", "p": 289}], "specs": [["Mandril", "1/2\" (13 mm)"], ["Potência", "650 W"], ["Impacto", "até 48.000 ipm"]]}, {"active": true, "top": true, "gas": false, "tag": "", "id": "m8", "cat": "fixacao", "sub": "Parafusos", "name": "Parafuso sextavado M8 zincado com porca", "brand": "Fixação", "sku": "PF-M8-ZN", "unit": "cento", "stock": 60, "vars": [{"l": "M8 x 20", "p": 22.9}, {"l": "M8 x 30", "p": 24.9}, {"l": "M8 x 50", "p": 31.9}], "specs": [["Rosca", "métrica grossa 1,25"], ["Classe", "8.8"], ["Acabamento", "zincado branco"], ["Venda", "cento (100 un)"]]}, {"active": true, "top": false, "gas": false, "tag": "", "id": "rebite", "cat": "fixacao", "sub": "Rebites", "name": "Rebite POP alumínio 4,0 x 12 mm, caixa 500", "brand": "Fixação", "sku": "RB-4012", "unit": "caixa", "stock": 35, "vars": [{"l": "4,0 x 12", "p": 39.9}, {"l": "4,8 x 16", "p": 54.9}], "specs": [["Corpo", "alumínio"], ["Haste", "aço"], ["Quantidade", "500 un"]]}, {"active": true, "top": false, "gas": false, "tag": "", "id": "prego", "cat": "fixacao", "sub": "Pregos", "name": "Prego com cabeça 17x27", "brand": "Fixação", "sku": "PR-1727", "unit": "kg", "stock": 300, "vars": [{"l": "17x27", "p": 18.9}, {"l": "18x30", "p": 18.5}], "specs": [["Bitola", "17 (3,0 mm)"], ["Comprimento", "27 linhas (62 mm)"], ["Venda", "por kg"]]}, {"active": true, "top": true, "gas": false, "tag": "Leve 25", "id": "disco", "cat": "abrasivos", "sub": "Discos de corte", "name": "Disco de corte inox 4.1/2\" x 1,0 mm", "brand": "Abrasivo", "sku": "DC-115-10", "unit": "un", "stock": 400, "vars": [{"l": "Unidade", "p": 4.9}, {"l": "Pacote com 25", "s": "R$ 4,36 cada", "p": 109}], "specs": [["Diâmetro", "115 mm"], ["Espessura", "1,0 mm"], ["Furo", "22,23 mm"], ["Rotação máx.", "13.300 rpm"]]}, {"active": true, "top": false, "gas": false, "tag": "", "id": "mascara", "cat": "epi", "sub": "Proteção facial", "name": "Máscara de solda automática tonalidade 9–13", "brand": "EPI", "sku": "EP-MSA913", "unit": "un", "stock": 12, "vars": [{"l": "Padrão", "p": 189}], "specs": [["Escurecimento", "1/25.000 s"], ["Tonalidade", "DIN 9 a 13"], ["CA", "com certificado de aprovação"]]}, {"active": true, "top": false, "gas": false, "tag": "", "id": "luva", "cat": "epi", "sub": "Luvas", "name": "Luva de raspa cano longo para soldador", "brand": "EPI", "sku": "EP-LRCL", "unit": "par", "stock": 80, "vars": [{"l": "Tamanho único", "p": 21.9}], "specs": [["Material", "raspa de couro"], ["Cano", "longo (34 cm)"]]}, {"active": true, "top": false, "gas": false, "tag": "", "id": "dobradica", "cat": "ferragens", "sub": "Dobradiças", "name": "Dobradiça para portão soldável 3\"", "brand": "Ferragem", "sku": "FG-DOB3", "unit": "par", "stock": 40, "vars": [{"l": "3\"", "p": 16.9}, {"l": "4\"", "p": 22.9}], "specs": [["Material", "aço carbono"], ["Uso", "portões e grades"]]}, {"active": true, "top": false, "gas": false, "tag": "", "id": "chave", "cat": "manuais", "sub": "Chaves", "name": "Jogo de chaves combinadas 6 a 22 mm, 12 peças", "brand": "Ferramenta manual", "sku": "FM-CC12", "unit": "jogo", "stock": 7, "vars": [{"l": "12 peças", "p": 149}], "specs": [["Material", "cromo-vanádio"], ["Medidas", "6 a 22 mm"]]}], "orders": [{"no": "4821", "items": [["e6013", 0, 5], ["disco", 1, 1], ["m8", 1, 2]], "ship": "moto", "pay": "pix", "doc": "cpf", "customer": "Marcos Silva", "status": 3, "historyOffsetsMin": [36, 34, 17, 0]}, {"no": "4710", "items": [["c25", 0, 1], ["er70", 0, 1], ["luva", 0, 2]], "ship": "truck", "pay": "card", "doc": "cnpj", "customer": "Serralheria Silva", "status": 4, "historyOffsetsMin": [21000, 20999, 20430, 19555, 19450]}, {"no": "4655", "items": [["m8", 0, 3], ["rebite", 0, 2], ["prego", 0, 5], ["disco", 0, 10], ["dobradica", 1, 2]], "ship": "pickup", "pay": "boleto", "doc": "cnpj", "customer": "Serralheria Silva", "status": 4, "historyOffsetsMin": [34000, 32600, 32550, 32545, 32280]}]};
-  var KEY_P = 'dbc.products.v1', KEY_O = 'dbc.orders.v1', KEY_N = 'dbc.lastOrderNo.v1', KEY_I = 'dbc.invoices.v1', KEY_R = 'dbc.returns.v1', KEY_S = 'dbc.settings.v1';
+  var KEY_P = 'dbc.products.v1', KEY_O = 'dbc.orders.v1', KEY_N = 'dbc.lastOrderNo.v1', KEY_I = 'dbc.invoices.v1', KEY_R = 'dbc.returns.v1', KEY_S = 'dbc.settings.v1', KEY_E = 'dbc.events.v1';
 
   var adapter = {
     name: 'local',
     load: function(key){ try{ var v = localStorage.getItem(key); return v ? JSON.parse(v) : null; }catch(e){ return null; } },
     save: function(key, value){ try{ localStorage.setItem(key, JSON.stringify(value)); return true; }catch(e){ return false; } }
   };
+
+  // ---------- sincronização entre aparelhos (Firebase) ----------
+  // Enquanto FIREBASE for null, tudo fica só neste navegador. Para sincronizar painel, apps de venda e entregador
+  // entre celulares diferentes, cole aqui a configuração do app web do Firebase (Console > Configurações do projeto).
+  var FIREBASE = null;
+  var SYNC_KEYS = [KEY_P, KEY_O, KEY_N, KEY_N + '.nf', KEY_I, KEY_R, KEY_S, KEY_E];
+  var remote = null, synced = {}, sync = { mode: FIREBASE ? 'firebase' : 'local', on: false, error: null };
+  var localSave = adapter.save;
+  function docId(k){ return k.replace(/\./g, '_'); }
+  adapter.save = function(key, value){
+    var ok = localSave(key, value);
+    // Só envia depois de receber a versão da nuvem, para um aparelho novo não apagar os dados com os de exemplo.
+    if(remote && synced[key] && SYNC_KEYS.indexOf(key) >= 0)
+      remote.doc(docId(key)).set({ v: JSON.stringify(value), t: Date.now() }).catch(function(e){ sync.error = String(e && e.message || e); notify(); });
+    return ok;
+  };
+  function loadScript(src){ return new Promise(function(res, rej){ var s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
+  function startSync(){
+    if(!FIREBASE) return;
+    var base = 'https://www.gstatic.com/firebasejs/10.12.5/';
+    (window.firebase ? Promise.resolve() : loadScript(base + 'firebase-app-compat.js').then(function(){ return loadScript(base + 'firebase-firestore-compat.js'); }))
+    .then(function(){
+      if(!firebase.apps.length) firebase.initializeApp(FIREBASE);
+      remote = firebase.firestore().collection('dbc');
+      SYNC_KEYS.forEach(function(k){
+        remote.doc(docId(k)).onSnapshot(function(snap){
+          var loc = null; try{ loc = localStorage.getItem(k); }catch(e){}
+          if(!snap.exists){ synced[k] = true; if(loc != null) remote.doc(docId(k)).set({ v: loc, t: Date.now() }); return; }
+          synced[k] = true; var v = snap.data().v;
+          if(v !== loc){ try{ localStorage.setItem(k, v); }catch(e){} notify(); }
+        }, function(e){ sync.error = String(e && e.message || e); notify(); });
+      });
+      sync.on = true; sync.error = null; notify();
+    }).catch(function(e){ sync.error = 'Não foi possível conectar ao Firebase'; notify(); });
+  }
 
   var listeners = [];
   function notify(){ listeners.forEach(function(cb){ try{ cb(); }catch(e){} }); }
@@ -70,6 +105,7 @@
     var o = { no: no, created: now(), items: data.items.map(snap), ship: data.ship, pay: data.pay, doc: data.doc || 'cpf', customer: data.customer || 'Marcos Silva', status: 0, history: [now()], code: String(1000 + Math.floor(Math.random() * 9000)), by: { 0: data.by || 'app' } };
     if(data.addr) o.addr = data.addr; if(data.phone) o.phone = data.phone;
     if(data.paid) { o.status = 1; o.history[1] = now(); o.by[1] = data.by === 'loja' ? 'loja' : 'automático'; }
+    logEvent({ type: 'order', orderNo: o.no, status: o.status, by: o.by[0], customer: o.customer, text: 'Novo pedido' + (o.status >= 1 ? ' pago' : '') });
     list.push(o); saveOrders(list); if(o.status >= 1) ensureSaleInvoice(o); return o;
   }
   function setStatus(no, status, by){
@@ -77,11 +113,20 @@
     if(!o) return;
     o.status = status; o.history = o.history || []; o.by = o.by || {}; o.by[status] = by || 'loja';
     if(status >= 0){ for(var i = 0; i <= status; i++){ if(!o.history[i]) o.history[i] = now(); } o.history.length = status + 1; }
+    logEvent({ type: 'status', orderNo: o.no, status: status, by: by || 'loja', customer: o.customer, text: stepText(o, status) });
     saveOrders(list);
     if(status >= 1) ensureSaleInvoice(o);
     if(status === -1) invoicesFor(o.no).forEach(function(n){ if(n.type === 'venda' && n.status !== 'cancelada') setInvoiceStatus(n.id, n.status === 'emitida' ? 'cancelada' : 'cancelada'); });
   }
 
+
+  // ---------- avisos (o que aconteceu, para o painel) ----------
+  function events(){ return (adapter.load(KEY_E) || []).slice().reverse(); }
+  function logEvent(e){
+    var l = adapter.load(KEY_E) || []; e.id = 'e' + Date.now().toString(36) + Math.floor(Math.random() * 1000); e.t = now(); l.push(e);
+    if(l.length > 150) l = l.slice(-150); adapter.save(KEY_E, l);
+  }
+  function stepText(o, st){ return st === -1 ? 'Cancelado' : stepNames(o)[st]; }
 
   // ---------- entrega ----------
   // Código de 4 dígitos que o cliente informa ao entregador para confirmar a entrega.
@@ -104,7 +149,7 @@
   function r2(n){ return Math.round(n * 100) / 100; }
 
   // ---------- configurações (taxas estimadas do meio de pagamento) ----------
-  var DEFAULT_SETTINGS = { fees: { pix: { pct: 0.99, fixed: 0 }, card: { pct: 4.98, fixed: 0 }, boleto: { pct: 0, fixed: 3.49 } } };
+  var DEFAULT_SETTINGS = { courierPin: '1234', fees: { pix: { pct: 0.99, fixed: 0 }, card: { pct: 4.98, fixed: 0 }, boleto: { pct: 0, fixed: 3.49 } } };
   function settings(){ var s = adapter.load(KEY_S); return s || clone(DEFAULT_SETTINGS); }
   function saveSettings(s){ adapter.save(KEY_S, s); notify(); }
   function fee(pay, amount){ var f = settings().fees[pay] || { pct: 0, fixed: 0 }; return r2(amount * (f.pct || 0) / 100 + (f.fixed || 0)); }
@@ -165,7 +210,7 @@
     var items = data.items.filter(function(it){ return it[2] > 0; }).map(function(it){ return [it[0], it[1], it[2], it[3] != null ? it[3] : priceOf(it[0], it[1])]; });
     var r = { id: id, orderNo: o.no, customer: o.customer, created: now(), reason: data.reason, note: data.note || '', items: items, amount: r2(data.amount),
       refund: data.refund || o.pay, restock: !!data.restock, restocked: false, status: 'solicitada', history: { solicitada: now() } };
-    l.push(r); adapter.save(KEY_R, l);
+    l.push(r); adapter.save(KEY_R, l); logEvent({ type: 'return', orderNo: o.no, by: data.by || 'loja', customer: o.customer, text: 'Devolução ' + r.id + ' registrada' });
     var inv = invoicesRaw(); inv.push(newInvoice(o, 'devolucao', r.amount, r.id)); adapter.save(KEY_I, inv);
     notify(); return r;
   }
@@ -233,7 +278,8 @@
     return { added: added, updated: updated, errors: errors };
   }
 
-  function reset(){ adapter.save(KEY_P, clone(SEED.products)); adapter.save(KEY_O, seedOrders()); adapter.save(KEY_N, 4821); adapter.save(KEY_I, null); adapter.save(KEY_R, null); adapter.save(KEY_S, null); notify(); }
+  function reset(){ adapter.save(KEY_P, clone(SEED.products)); adapter.save(KEY_O, seedOrders()); adapter.save(KEY_N, 4821); adapter.save(KEY_I, null); adapter.save(KEY_R, null); adapter.save(KEY_S, null); adapter.save(KEY_E, null); notify(); }
+  function checkCourierPin(pin){ return String(pin).trim() === String(settings().courierPin || '1234'); }
 
   window.DBCStore = {
     adapter: adapter.name, cats: SEED.cats,
@@ -244,6 +290,8 @@
     invoices: invoices, invoicesFor: invoicesFor, emitInvoice: emitInvoice, setInvoiceStatus: setInvoiceStatus, attachInvoiceFile: attachInvoiceFile, invoiceXML: invoiceXML,
     returns: returns, returnsFor: returnsFor, createReturn: createReturn, setReturnStatus: setReturnStatus, RETURN_STATUS: RETURN_STATUS,
     settings: settings, saveSettings: saveSettings, fee: fee,
+    events: events, checkCourierPin: checkCourierPin, syncStatus: function(){ return { mode: sync.mode, on: sync.on, error: sync.error }; },
     onChange: function(cb){ listeners.push(cb); }
   };
+  startSync();
 })();

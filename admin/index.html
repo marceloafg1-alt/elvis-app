@@ -279,6 +279,7 @@ main{padding-bottom:calc(120px + var(--sb))}
 .qnew .i{color:#fff}
 .tl .by{font-size:11.5px;font-weight:600;color:var(--tint-ink);background:var(--tint);border-radius:999px;padding:2px 8px;margin-left:6px}
 .it > .st{align-self:center}
+.evc.new{border-color:var(--orange);box-shadow:0 0 0 2px rgba(242,138,38,.25),var(--shadow)}
 details.fix summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
 details.fix summary::-webkit-details-marker{display:none}
 details.fix summary h3{margin:0}
@@ -342,7 +343,7 @@ select.f,input.f,textarea.f{border-radius:14px}
 <input type="file" id="photofile" accept="image/*" hidden>
 <input type="file" id="nffile" hidden>
 
-<script src="../data/store.js?v=12"></script>
+<script src="../data/store.js?v=13"></script>
 <script>
 (function(){
 const D = window.DBCStore;
@@ -397,7 +398,9 @@ function chrome(){
     <div class="lbl">Ver no app</div>
     <a href="../" target="_blank" rel="noopener">${svg('ext')}App versão 1</a>
     <a href="../v2/" target="_blank" rel="noopener">${svg('ext')}App versão 2</a>
-    <div class="foot">Dados salvos neste navegador. Para valer em todos os celulares, o próximo passo é ligar o Firebase.</div>`;
+    <a href="../entregador/" target="_blank" rel="noopener">${svg('truck')}App do entregador</a>
+    <button data-feed>${svg('bell')}Avisos${unread()?` <span class="tag star" style="margin-left:auto">${unread()}</span>`:''}</button>
+    <div class="foot">${(sy=>sy.mode==='firebase'?(sy.error?'Sem conexão com a nuvem: '+esc(sy.error):sy.on?'Sincronizado com a nuvem (Firebase).':'Conectando à nuvem…'):'Dados salvos neste navegador. Para valer em todos os celulares, o próximo passo é ligar o Firebase.')(D.syncStatus())}</div>`;
   $('tlogo').innerHTML=LOCKUP;
   $('ttitle').textContent='Painel · '+NAV.find(n=>n.id===S.tab).l;
   const mcur=MOB.includes(S.tab)?S.tab:'more';
@@ -440,6 +443,8 @@ const V = {
       <div class="dcard"><h3>Importar planilha</h3><p>Envie um CSV no mesmo formato do exportado. Produtos com o mesmo código são atualizados; os novos são incluídos.</p><button class="btn ghost" data-import>${svg('up',2)}Escolher arquivo</button>
         ${m?`<div class="result${m.bad?' bad':''}">${esc(m.text)}</div>`:''}</div>
       <div class="dcard"><h3>Testar nos apps</h3><p>Abra um app em outra aba. O que você salvar aqui aparece lá na hora.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn ghost" href="../" target="_blank" rel="noopener">${svg('ext')}Versão 1</a><a class="btn ghost" href="../v2/" target="_blank" rel="noopener">${svg('ext')}Versão 2</a></div></div>
+      <div class="dcard"><h3>Senha do entregador</h3><p>O entregador digita esta senha de 4 números para entrar no modo entregador, pelo app de vendas ou pelo app dele.</p><div style="display:flex;gap:8px"><input class="f mono" id="pin" inputmode="numeric" maxlength="4" value="${esc(D.settings().courierPin||'1234')}" aria-label="Senha do entregador" style="max-width:120px;font-size:18px;letter-spacing:.2em"><button class="btn" data-savepin>Salvar</button></div></div>
+      <div class="dcard"><h3>Sincronização</h3><p>${(sy=>sy.mode==='firebase'?(sy.on&&!sy.error?'Ligada. Painel, apps de venda e entregador recebem as mudanças na hora, em qualquer celular.':'Configurada, mas sem conexão agora'+(sy.error?': '+esc(sy.error):'.')):'Desligada. Os dados ficam só neste navegador. Para o entregador avisar o painel de outro celular, falta ligar o Firebase.')(D.syncStatus())}</p></div>
       <div class="dcard"><h3>Restaurar exemplos</h3><p>Volta os produtos e pedidos de exemplo. Apaga o que foi cadastrado neste navegador.</p>
         ${S.resetAsk?`<div class="confirm"><span>Apagar tudo e voltar aos exemplos?</span><button class="btn sm bad" data-reset-yes>Sim, restaurar</button><button class="btn sm ghost" data-reset-no>Cancelar</button></div>`:`<button class="btn bad" data-reset>${svg('trash',2)}Restaurar exemplos</button>`}</div>
     </div>`;
@@ -626,7 +631,7 @@ V.home=function(){
   const low=D.allProducts().filter(p=>p.active!==false&&p.stock<5).length, open=c('open');
   return `<section class="htop"><div class="hrowx"><h1 class="hello">${greet()}</h1>
       <button class="tb" data-tab="products" aria-label="Buscar produto">${svg('search',2)}</button>
-      <button class="tb" data-ostage="open" aria-label="Pedidos em andamento">${svg('bell',1.9)}${open?`<span class="dotn">${open}</span>`:''}</button></div>
+      <button class="tb" data-feed aria-label="Avisos">${svg('bell',1.9)}${unread()?`<span class="dotn">${unread()}</span>`:''}</button></div>
     <div class="storeline"><span>${svg('pin',2)}Rua Vinte de Maio, 320 · Piedade - SP</span><span>(15) 3344-2737</span></div></section>
   <section class="hero">
     <div class="hero-h"><span>Pedidos de hoje</span><span class="pill-t">${open} em andamento</span></div>
@@ -674,6 +679,34 @@ function newOrder(){
   <div class="df"><button class="btn ghost" data-close>Cancelar</button><button class="btn or" data-nsave>${svg('check',2.4)}Criar pedido</button></div></section>`;
 }
 function readNO(){if(!$('n-cus'))return;const N=S.no;N.customer=$('n-cus').value;N.phone=$('n-phone').value;N.doc=$('n-doc').value;N.ship=$('n-ship').value;N.pay=$('n-pay').value;if($('n-addr'))N.addr=$('n-addr').value;N.sel=$('n-prod').value}
+
+
+// ---------- avisos ----------
+const SEEN_K='dbc.panel.seenEvents';
+const evFrom=e=>e.by!=='loja';
+function seenAt(){try{return localStorage.getItem(SEEN_K)||''}catch(_){return ''}}
+function unread(){const t=seenAt();return D.events().filter(e=>evFrom(e)&&e.t>t).length}
+const BY_L={entregador:'pelo entregador',app:'pelo cliente no app','automático':'automático',loja:'pela loja'};
+function evIcon(e){return e.type==='order'?'list':e.type==='return'?'ret':e.status===3||e.status===4?'truck':'check'}
+function evTitle(e){return e.type==='status'?`#${e.orderNo} · ${e.text}`:`#${e.orderNo} · ${e.text}`}
+function feedView(){
+  const t=seenAt(), l=D.events().slice(0,60), np=('Notification' in window)?Notification.permission:'na';
+  return `<div class="scrim" data-close></div><section class="drawer" role="dialog" aria-modal="true" aria-label="Avisos">
+  <div class="dh"><button class="x" data-close aria-label="Fechar">${svg('x',2)}</button><h2>Avisos</h2></div>
+  <div class="db">
+    ${np==='default'?`<div class="notice" style="margin:0"><b>Receber aviso no aparelho</b>Quando o entregador sair ou entregar, o aparelho mostra uma notificação enquanto o painel estiver aberto.<div style="margin-top:10px"><button class="btn sm" data-notif>Ativar notificações</button></div></div>`:''}
+    <div class="olist">${l.length?l.map(e=>`<button class="ocard evc${evFrom(e)&&e.t>t?' new':''}" data-order="${e.orderNo}"><span style="display:flex;gap:12px;align-items:center"><span class="sq" style="width:42px;height:42px;border-radius:13px">${svg(evIcon(e),1.8)}</span><span><b>${esc(evTitle(e))}</b><br><small>${esc(e.customer||'')} · ${BY_L[e.by]||e.by} · ${fmt(e.t)}</small></span></span><span></span></button>`).join(''):'<div class="empty">Nenhum aviso ainda.</div>'}</div>
+  </div></section>`;
+}
+let lastEv=(D.events()[0]||{}).id||'';
+function beep(){try{const c=new (window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.frequency.value=880;g.gain.setValueAtTime(.0001,c.currentTime);g.gain.exponentialRampToValueAtTime(.2,c.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+.35);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.4)}catch(_){}}
+function checkEvents(){
+  const l=D.events(), i=l.findIndex(e=>e.id===lastEv), fresh=(i<0?l.slice(0,lastEv?5:0):l.slice(0,i)).filter(evFrom).reverse();
+  if(l[0])lastEv=l[0].id;
+  fresh.forEach(e=>{const who=e.by==='entregador'?'Entregador':e.by==='app'?'App':'Aviso';const msg=`${who}: #${e.orderNo} · ${e.text}`;toast(msg);
+    try{if('Notification' in window&&Notification.permission==='granted')new Notification('DBC Painel',{body:msg+(e.customer?' · '+e.customer:''),icon:'icon-192.png',tag:e.id})}catch(_){}});
+  if(fresh.length)beep();
+}
 
 function editor(){
   const p=S.edit, isNew=!D.allProducts().some(x=>x.id===p.id);
@@ -742,7 +775,7 @@ function renderLayer(){
   if(!S.layer){el.innerHTML='';document.body.style.overflow='';return}
   document.body.style.overflow='hidden';
   const sc=el.querySelector('.db')?.scrollTop||0;
-  el.innerHTML=S.layer==='quick'?quickSheet():S.layer==='pickret'?pickRet():S.layer==='neworder'?newOrder():S.layer==='edit'?editor():S.layer==='retform'?retForm():S.layer==='ret'?retView():S.layer==='inv'?invView():orderView();
+  el.innerHTML=S.layer==='feed'?feedView():S.layer==='quick'?quickSheet():S.layer==='pickret'?pickRet():S.layer==='neworder'?newOrder():S.layer==='edit'?editor():S.layer==='retform'?retForm():S.layer==='ret'?retView():S.layer==='inv'?invView():orderView();
   const db=el.querySelector('.db'); if(db) db.scrollTop=sc;
   if(S.layer==='neworder'&&S.no.sel&&$('n-prod')) $('n-prod').value=S.no.sel;
 }
@@ -764,6 +797,9 @@ document.addEventListener('click',e=>{
   if('tab' in d){if(S.layer){S.layer=null;renderLayer()}S.tab=d.tab;S.csvMsg=null;S.resetAsk=false;return render()}
   if('per' in d){S.per=d.per;return render(true)}
   if('fab' in d){S.layer='quick';return renderLayer()}
+  if('feed' in d){S.layer='feed';renderLayer();try{localStorage.setItem(SEEN_K,new Date().toISOString())}catch(_){}return render(true)}
+  if('notif' in d){Notification.requestPermission().then(()=>renderLayer());return}
+  if('savepin' in d){const v=($('pin')||{}).value||'';if(!/^\d{4}$/.test(v))return toast('Use 4 números');const st=D.settings();st.courierPin=v;D.saveSettings(st);return toast('Senha do entregador salva')}
   if('qlink' in d){S.layer=null;renderLayer();return window.open(d.qlink,'_blank','noopener')}
   if('ostage' in d){if(S.layer){S.layer=null;renderLayer()}S.tab='orders';S.ofilter=d.ostage;return render()}
   if('neworder' in d){S.no={customer:'',phone:'',doc:'cpf',ship:'pickup',pay:'pix',addr:'',paid:true,items:[],sel:''};S.err='';S.layer='neworder';return renderLayer()}
@@ -825,7 +861,7 @@ $('photofile').addEventListener('change',async e=>{const f=e.target.files[0];if(
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&S.layer)close()});
 $('nffile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;if(f.size>1.5e6){toast('Arquivo grande demais para o teste (máx. 1,5 MB)');return}const r=new FileReader();r.onload=()=>{if(D.attachInvoiceFile(S.inv,S.attachKind,f.name,r.result))toast('Arquivo anexado');else toast('Sem espaço neste navegador para o arquivo');renderLayer();render(true)};r.readAsDataURL(f)});
 document.addEventListener('change',e=>{if(e.target.id==='n-ship'||e.target.id==='n-pay'){readNO();return renderLayer()}if(e.target.id==='pf'){S.from=e.target.value;render(true)}if(e.target.id==='pt'){S.to=e.target.value;render(true)}});
-D.onChange(()=>{if(!S.layer)render(true)});
+D.onChange(()=>{checkEvents();if(!S.layer)render(true);else if(S.layer==='feed')renderLayer();else chrome()});
 render();
 })();
 </script>

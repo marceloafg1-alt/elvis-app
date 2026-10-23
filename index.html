@@ -357,7 +357,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--spark);outline-
   </div>
 </div>
 
-<script src="data/store.js?v=12"></script>
+<script src="data/store.js?v=13"></script>
 <script>
 window.addEventListener('error',function(e){var v=document.getElementById('view');if(v&&!v.innerHTML)v.innerHTML='<div style="padding:24px;font:14px system-ui">Não foi possível abrir o protótipo neste aparelho.<br><small>'+(e.message||'')+'</small></div>'});
 (function(){
@@ -638,6 +638,7 @@ const R = {
         <button>${svg('heart')}<span>Listas por obra</span><small>3</small>${svg('chev',2)}</button>
         <button>${svg('chat')}<span>Falar com a loja<br><small>(15) 3344-2737</small></span>${svg('chev',2)}</button></div>
       ${STORE_HTML()}
+      ${window.DBCStore?`<div class="menu"><button onclick="location.href='entregador/?from=v1'">${svg('truck')}<span>Sou entregador<br><small>Entregas do dia, saída e confirmação com código</small></span>${svg('chev',2)}</button></div>`:''}
       <div class="menu"><button data-open-sheet>${svg('info')}<span>Sobre este esboço<br><small>Funcionalidades, stack e próximos passos</small></span>${svg('chev',2)}</button></div>
     </section></div>`;
   }

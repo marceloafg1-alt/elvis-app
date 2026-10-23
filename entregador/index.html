@@ -83,6 +83,13 @@ svg.i{width:22px;height:22px;flex:none}
 .code input{height:68px;text-align:center;font:700 30px var(--mono);border:2px solid var(--line);border-radius:18px;background:var(--card);outline:none;min-width:0}
 .code input:focus{border-color:var(--navy-2)}
 .err{background:var(--bad-bg);color:var(--bad);border-radius:14px;padding:10px 12px;font-weight:600;font-size:14.5px;margin-bottom:12px}
+.gate{min-height:calc(100vh - 80px);display:flex;flex-direction:column;justify-content:center;gap:14px;max-width:420px;margin:0 auto}
+.gate h1{margin:6px 0 0;font-size:34px;font-weight:600;letter-spacing:-.025em}
+.gate p{margin:0;color:var(--muted)}
+.links{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:18px;font-size:14px}
+.links a,.links button{color:var(--tint-ink);font-weight:600;background:none;border:0;padding:0;cursor:pointer}
+.sync{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--muted)}.sync.on i{background:var(--ok)}
 .toast{position:fixed;left:50%;bottom:calc(24px + var(--sb));transform:translateX(-50%);z-index:60;background:var(--navy);color:#fff;border-radius:999px;padding:12px 18px;font-weight:600;font-size:14.5px;display:flex;gap:8px;align-items:center;white-space:nowrap;box-shadow:var(--shadow)}
 .toast .i{width:16px;height:16px;color:var(--orange)}
 button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
@@ -91,7 +98,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 <body>
 <main class="w" id="app"></main>
 <div id="layer"></div>
-<script src="../data/store.js?v=12"></script>
+<script src="../data/store.js?v=13"></script>
 <script>
 const D=window.DBCStore, $=id=>document.getElementById(id);
 const brl=n=>(+n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
@@ -101,6 +108,20 @@ const I={pin:'<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21
 const svg=(k,sw=1.8)=>`<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[k]}</svg>`;
 const SHIP_L={moto:'Moto',truck:'Caminhonete'};
 const S={f:'ready',sheet:null,err:''};
+const FROM=(new URLSearchParams(location.search).get('from')==='v1')?'../':'../v2/';
+const OK_K='dbc.courier.pin';
+function authed(){try{return D.checkCourierPin(localStorage.getItem(OK_K)||'')}catch(_){return false}}
+function gate(){
+  $('app').innerHTML=`<section class="gate"><div class="brand"><span class="lg">${LOCKUP}</span>Entregas</div>
+    <h1>Modo entregador</h1><p>Digite a senha de 4 números que a loja passou.</p>
+    ${S.err?`<div class="err" style="margin:0">${esc(S.err)}</div>`:''}
+    <div class="code" style="margin:0">${[0,1,2,3].map(i=>`<input inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Número ${i+1}" data-pi="${i}">`).join('')}</div>
+    <button class="btn" data-login style="flex:none">Entrar</button>
+    <div class="links"><a href="${FROM}">← Voltar ao app de vendas</a></div></section>`;
+  const ins=[...document.querySelectorAll('[data-pi]')];ins[0].focus();
+  ins.forEach((inp,i)=>{inp.addEventListener('input',()=>{inp.value=inp.value.replace(/\D/g,'').slice(-1);if(inp.value&&ins[i+1])ins[i+1].focus();if(ins.every(x=>x.value))login()});inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!inp.value&&ins[i-1])ins[i-1].focus()})});
+}
+function login(){const v=[...document.querySelectorAll('[data-pi]')].map(x=>x.value).join('');if(D.checkCourierPin(v)){try{localStorage.setItem(OK_K,v)}catch(_){}S.err='';render()}else{S.err='Senha incorreta.';gate()}}
 const hm=iso=>iso?new Date(iso).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'';
 const isToday=iso=>iso&&new Date(iso).toDateString()===new Date().toDateString();
 const F={
@@ -123,6 +144,7 @@ function card(o){
   </article>`;
 }
 function render(){
+  if(!authed())return gate();
   const all=D.orders().filter(o=>o.ship!=='pickup'&&o.status!==-1), c=k=>all.filter(F[k][1]).length, list=all.filter(F[S.f][1]);
   if(S.f==='ready')list.sort((a,b)=>(a.history[2]||'').localeCompare(b.history[2]||''));
   $('app').innerHTML=`<section class="top"><div class="brand"><span class="lg">${LOCKUP}</span>Entregas</div>
@@ -130,7 +152,8 @@ function render(){
     <section class="hero">${['ready','route','done'].map(k=>`<button class="stat" data-f="${k}" aria-pressed="${S.f===k}"><b>${c(k)}</b><span>${F[k][0]}</span></button>`).join('')}</section>
     <div class="chips">${Object.entries(F).map(([k,[l]])=>`<button class="chip" data-f="${k}" aria-pressed="${S.f===k}">${l} (${c(k)})</button>`).join('')}</div>
     ${list.length?list.map(card).join(''):`<div class="empty">${{ready:'Nenhum pedido pronto para sair agora.',route:'Nenhuma entrega em rota.',prep:'Nada em separação na loja.',done:'Nenhuma entrega concluída hoje.'}[S.f]}</div>`}
-    <p class="note">Peça ao cliente o código de 4 números que aparece no app dele.<br>Problema na entrega? Ligue para a loja: <a href="tel:+551533442737"><b>(15) 3344-2737</b></a></p>`;
+    <p class="note">Peça ao cliente o código de 4 números que aparece no app dele.<br>Problema na entrega? Ligue para a loja: <a href="tel:+551533442737"><b>(15) 3344-2737</b></a></p>
+    <div class="links"><a href="${FROM}">← App de vendas</a>${(sy=>`<span class="sync${sy.on&&!sy.error?' on':''}"><i></i>${sy.mode==='firebase'?(sy.on&&!sy.error?'Ligado à loja':'Sem conexão'):'Só neste aparelho'}</span>`)(D.syncStatus())}<button data-logout>Sair</button></div>`;
 }
 function sheet(){
   const el=$('layer');
@@ -159,8 +182,10 @@ document.addEventListener('click',e=>{
   if('deliver' in d){S.sheet=d.deliver;S.err='';return sheet()}
   if('close' in d){S.sheet=null;S.err='';return sheet()}
   if('confirm' in d)return confirm();
+  if('login' in d)return login();
+  if('logout' in d){try{localStorage.removeItem(OK_K)}catch(_){}return render()}
 });
-D.onChange(()=>render());
+D.onChange(()=>{if(!document.querySelector('[data-pi]'))render()});
 render();
 </script>
 </body>

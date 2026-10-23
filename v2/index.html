@@ -314,7 +314,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
       </ol>
     </section></template>
 
-<script src="../data/store.js?v=12"></script>
+<script src="../data/store.js?v=13"></script>
 <script>
 window.addEventListener('error',function(e){var v=document.getElementById('view');if(v&&!v.innerHTML)v.innerHTML='<div style="padding:24px;font:14px system-ui">Não foi possível abrir o protótipo neste aparelho.<br><small>'+(e.message||'')+'</small></div>'});
 (function(){
@@ -571,6 +571,7 @@ const R = {
       ${row('pin','Endereços','2 endereços salvos')}
       ${row('building','Dados da empresa','CNPJ 12.345.678/0001-90')}
       ${row('store','DBC Gases e Locações','Rua Vinte de Maio, 320 · (15) 3344-2737','data-layer="store"')}
+      ${window.DBCStore?row('truck','Sou entregador','Entregas do dia, saída e confirmação com código',`onclick="location.href='../entregador/?from=v2'"`):''}
       ${row('info','Sobre este esboço','Funcionalidades, stack e próximos passos','data-layer="notes"')}</div>`;
   },
   _sb(){
