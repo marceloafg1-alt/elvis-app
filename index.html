@@ -357,6 +357,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--spark);outline-
   </div>
 </div>
 
+<script src="data/store.js?v=9"></script>
 <script>
 window.addEventListener('error',function(e){var v=document.getElementById('view');if(v&&!v.innerHTML)v.innerHTML='<div style="padding:24px;font:14px system-ui">Não foi possível abrir o protótipo neste aparelho.<br><small>'+(e.message||'')+'</small></div>'});
 (function(){
@@ -405,7 +406,7 @@ const CATS = [
   {id:'abrasivos',name:'Discos',icon:'disc'},{id:'epi',name:'EPI',icon:'mask'},
   {id:'ferragens',name:'Ferragens',icon:'hinge'},{id:'manuais',name:'Manuais',icon:'wrench'}
 ];
-const P = [
+let P = [
   {id:'inv160',cat:'solda',sub:'Máquinas',name:'Inversora de solda MMA 160 A bivolt',brand:'Linha profissional',sku:'SD-160MMA',unit:'un',stock:6,top:true,
     vars:[{l:'160 A',p:689.90},{l:'200 A',p:899.00,s:'até eletrodo 4,0 mm'}],
     specs:[['Corrente','20 a 160 A'],['Tensão','127 / 220 V automático'],['Eletrodo','até 3,25 mm'],['Ciclo de trabalho','60% a 160 A'],['Garantia','12 meses']]},
@@ -459,11 +460,18 @@ const ORDERS=[
   steps:[['Pedido recebido','08/10 · 09:15',1],['Pagamento aprovado','Cartão em 3x · 09:16',1],['Separado no estoque','08/10 · 16:40',1],['Saiu para entrega','Caminhonete · 09/10 · 08:20',1],['Entregue','09/10 · 10:05 · recebido por Marcos',1]]},
  {no:'4655',date:'29/09 às 16:40',items:[['m8',0,3],['rebite',0,2],['prego',0,5],['disco',0,10],['dobradica',1,2]],ship:'pickup',pay:'boleto',status:'ok',label:'Retirado',
   steps:[['Pedido recebido','29/09 · 16:40',1],['Boleto pago','30/09 · 10:12',1],['Separado no estoque','30/09 · 11:00',1],['Pronto para retirada','30/09 · 11:05',1],['Retirado na loja','30/09 · 15:30 · por Marcos',1]]}];
-const ORD=no=>ORDERS.find(o=>o.no===no);
+
+function fmtDate(iso){const d=new Date(iso),t=new Date(),hm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');return d.toDateString()===t.toDateString()?'Hoje às '+hm:String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+' às '+hm}
+function ORDERS_(){ if(!window.DBCStore) return ORDERS; return DBCStore.orders().map(o=>Object.assign({},o,{stage:o.status,status:o.status===-1?'cx':o.status>=4?'ok':'go',label:DBCStore.statusLabel(o),date:fmtDate(o.created),steps:DBCStore.steps(o)})); }
+function prodAny(id){ return byId(id) || (window.DBCStore && DBCStore.allProducts().find(p=>p.id===id)) || {id,name:'Produto removido do catálogo',sku:'—',unit:'un',cat:'ferragens',sub:'',brand:'',vars:[{l:'—',p:0}],specs:[]}; }
+const vr=(p,v)=>p.vars[v]||p.vars[0];
+function placeOrder(paid,doc){ if(!window.DBCStore||!S.cart.length) return null; return DBCStore.createOrder({items:S.cart.map(c=>[c.id,c.v,c.q]),ship:S.ship,pay:S.pay,doc,paid}); }
+function syncStore(){ if(!window.DBCStore) return; P=DBCStore.products(); S.cart=S.cart.filter(c=>byId(c.id)&&byId(c.id).vars[c.v]); }
+const ORD=no=>ORDERS_().find(o=>o.no===String(no));
 const SHIP_L={moto:'Moto',truck:'Caminhonete agendada',pickup:'Retirada na loja'};
-function oTot(o){const sub=o.items.reduce((a,[id,v,q])=>a+byId(id).vars[v].p*q,0),fee={moto:14.90,truck:39.90,pickup:0}[o.ship],disc=o.pay==='pix'?sub*.05:0;return {sub,fee,disc,total:sub+fee-disc}}
+function oTot(o){const sub=o.items.reduce((a,[id,v,q])=>a+vr(prodAny(id),v).p*q,0),fee={moto:14.90,truck:39.90,pickup:0}[o.ship],disc=o.pay==='pix'?sub*.05:0;return {sub,fee,disc,total:sub+fee-disc}}
 function payL(o,t){return o.pay==='pix'?'Pix com 5% de desconto':o.pay==='card'?'Cartão de crédito, 3x de '+brl(t.total/3):'Boleto bancário'}
-function oSummary(o){const names=o.items.map(([id])=>byId(id).sub.toLowerCase());return o.items.length+(o.items.length===1?' produto':' produtos')+' · '+SHIP_L[o.ship].toLowerCase()}
+function oSummary(o){return o.items.length+(o.items.length===1?' produto':' produtos')+' · '+SHIP_L[o.ship].toLowerCase()}
 
 const S = {screen:'home',hist:[],cat:'solda',sub:'Todos',q:'',prod:'c25',variant:0,qty:1,cart:DEFAULT_CART(),ship:'moto',pay:'pix',cnpj:false,orderNo:'4821'};
 
@@ -473,7 +481,7 @@ const cartQty = () => S.cart.reduce((a,c)=>a+c.q,0);
 const hasGas = () => S.cart.some(c=>byId(c.id).gas);
 function totals(){const sub=S.cart.reduce((a,c)=>a+lineTotal(c),0),fee={moto:14.90,truck:39.90,pickup:0}[S.ship],disc=S.pay==='pix'?sub*.05:0;return {sub,fee,disc,total:sub+fee-disc}}
 
-function thumb(p,extra=''){const c=CATS.find(c=>c.id===p.cat);return `<div class="thumb">${svg(c.icon,1.5)}${extra}<span class="sku">${p.sku}</span></div>`}
+function thumb(p,extra=''){const c=CATS.find(c=>c.id===p.cat);return `<div class="thumb">${p.photo?`<img src="${p.photo}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit">`:svg(c.icon,1.5)}${extra}<span class="sku">${p.sku}</span></div>`}
 function card(p){const v=p.vars[0];return `<button class="pcard" data-p="${p.id}">${thumb(p,(p.tag?`<span class="tag">${p.tag}</span>`:'')+'<span class="plus">+</span>')}<div class="pbody"><div class="pname">${p.name}</div><div class="price">${brl(v.p)} <span class="unit">/${p.unit}</span></div><div class="pix">${brl(v.p*.95)} no Pix</div></div></button>`}
 function top(title,{back=true,right=''}={}){return `<div class="topbar"><div class="c">${back?`<button class="ib" data-back aria-label="Voltar">${svg('back',2.2)}</button>`:''}<h2>${title}</h2>${right}</div></div>`}
 
@@ -520,7 +528,7 @@ const R = {
   prod(){
     const p=byId(S.prod), v=p.vars[S.variant], c=CATS.find(c=>c.id===p.cat);
     return `<div class="pd-hero"><div class="float"><button class="ib" data-back aria-label="Voltar">${svg('back',2.2)}</button><button class="ib" aria-label="Favoritar">${svg('heart',2)}</button></div>
-      <div class="art">${svg(c.icon,1.3)}</div></div>
+      <div class="art" style="position:relative">${p.photo?`<img src="${p.photo}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-fit:contain">`:svg(c.icon,1.3)}</div></div>
     <div class="pd"><div class="c">
       <div><div class="brand">${p.brand} · ${p.sku}</div><h1>${p.name}</h1></div>
       <div><div class="bigprice">${brl(v.p)} <span class="unit">/${p.unit}</span></div>
@@ -579,11 +587,11 @@ const R = {
     return top('Pagamento Pix')+`<div class="c narrow"><section class="sec"><div class="pixbox">
       <span class="timer">Pague em <span id="timer">14:59</span></span>
       <div class="qrw"><canvas id="qr" width="29" height="29" aria-label="QR Code Pix de exemplo"></canvas></div>
-      <div><div class="unit">Pedido #${S.orderNo}</div><div class="bigprice">${brl(t.total)}</div></div>
-      <div class="code" id="pixcode">00020126580014BR.GOV.BCB.PIX0136exemplo-dbc-${S.orderNo}52040000530398654${t.total.toFixed(2)}5802BR5911DBC EXEMPLO6007PIEDADE6304A1B2</div>
+      <div><div class="unit">Pedido #${S.lastOrder||S.orderNo}</div><div class="bigprice">${brl(t.total)}</div></div>
+      <div class="code" id="pixcode">00020126580014BR.GOV.BCB.PIX0136exemplo-dbc-${S.lastOrder||S.orderNo}52040000530398654${t.total.toFixed(2)}5802BR5911DBC EXEMPLO6007PIEDADE6304A1B2</div>
       <button class="cta ghost" data-copy style="width:100%;flex:none">Copiar código Pix</button>
       <div class="unit">Abra o app do banco, escolha Pix e leia o QR Code ou cole o código.</div></div></section></div>
-    <div class="actionbar"><div class="c"><button class="cta dark" data-go="track">Simular pagamento aprovado</button></div></div>`;
+    <div class="actionbar"><div class="c"><button class="cta dark" data-paid>Simular pagamento aprovado</button></div></div>`;
   },
   track(){
     const steps=[['Pedido recebido','Hoje, 14:02',1],['Pagamento aprovado','Pix · 14:04',1],['Separado no estoque','Conferido por Jéssica · 14:21',1],['Saiu para entrega','Moto · 14:38','now'],['Entregue','Previsto até 15:10',0]];
@@ -600,7 +608,7 @@ const R = {
   },
   orders(){
     return `<div class="c narrow"><h1 class="big-title">Pedidos</h1><section class="sec">
-      ${ORDERS.map(o=>`<button class="orow" data-order="${o.no}"><span><b>#${o.no}</b> · ${o.date}<br><span class="unit">${oSummary(o)} · ${brl(oTot(o).total)}</span></span><span class="pill ${o.status==='go'?'go':'okp'}">${o.label}</span></button>`).join('')}</section></div>`;
+      ${ORDERS_().map(o=>`<button class="orow" data-order="${o.no}"><span><b>#${o.no}</b> · ${o.date}<br><span class="unit">${oSummary(o)} · ${brl(oTot(o).total)}</span></span><span class="pill ${o.status==='go'?'go':'okp'}">${o.label}</span></button>`).join('')}</section></div>`;
   },
   order(){
     const o=ORD(S.order), t=oTot(o), live=o.status==='go';
@@ -608,7 +616,7 @@ const R = {
       <div class="card"><div class="k">Feito em</div>${o.date}<div class="unit">${SHIP_L[o.ship]} · ${payL(o,t)}</div></div>
       ${live?`<button class="cta dark" data-go="track">${svg('moto',2)}Acompanhar no mapa</button>`:''}
       <div class="lbl">Itens (${o.items.length})</div>
-      <div class="list">${o.items.map(([id,v,q])=>{const p=byId(id),x=p.vars[v];return `<div class="li">${thumb(p)}<div style="min-width:0"><div class="li-top">${p.name}</div><div class="li-var">${x.l} · ${q} ${p.unit} × ${brl(x.p)}</div><div class="li-bot"><span class="unit">${p.sku}</span><b class="price">${brl(x.p*q)}</b></div></div></div>`}).join('')}</div>
+      <div class="list">${o.items.map(([id,v,q])=>{const p=prodAny(id),x=vr(p,v);return `<div class="li">${thumb(p)}<div style="min-width:0"><div class="li-top">${p.name}</div><div class="li-var">${x.l} · ${q} ${p.unit} × ${brl(x.p)}</div><div class="li-bot"><span class="unit">${p.sku}</span><b class="price">${brl(x.p*q)}</b></div></div></div>`}).join('')}</div>
       <div class="sum"><div class="r"><span>Produtos</span><span>${brl(t.sub)}</span></div><div class="r"><span>Entrega</span><span>${t.fee?brl(t.fee):'Grátis'}</span></div>${t.disc?`<div class="r disc"><span>Desconto Pix</span><span>−${brl(t.disc)}</span></div>`:''}<div class="r tot"><span>Total</span><span>${brl(t.total)}</span></div></div>
       <div class="lbl">${o.ship==='pickup'?'Retirada':'Entrega'}</div>
       <div class="card">${o.ship==='pickup'?'DBC Gases e Locações<div class="unit">Rua Vinte de Maio, 320 · Bairro dos Cotianos · Piedade - SP</div>':'Rua das Indústrias, 450, galpão 3 · Distrito Industrial, Piedade - SP<div class="unit">Recebe: Marcos · (15) 9 8765-4321</div>'}</div>
@@ -692,12 +700,14 @@ document.addEventListener('click',e=>{
   if('ship' in d){ if(d.ship==='moto'&&hasGas()) return; S.ship=d.ship; return render(false); }
   if('pay' in d){ S.pay=d.pay; return render(false); }
   if('cnpj' in d){ S.cnpj=!S.cnpj; return render(false); }
-  if('place' in d){ if(S.pay==='pix') return go('pix'); toast(S.pay==='card'?'Pagamento aprovado':'Boleto gerado'); S.hist=[]; S.screen='track'; return render(); }
+  if('place' in d){ const o=placeOrder(S.pay==='card',S.cnpj?'cnpj':'cpf'); S.lastOrder=o?o.no:null; if(S.pay==='pix') return go('pix'); toast(S.pay==='card'?'Pagamento aprovado':'Boleto gerado'); if(o){S.cart=[];S.order=o.no;S.hist=[];S.screen='order';return render()} S.hist=[]; S.screen='track'; return render(); }
+  if('paid' in d){ if(S.lastOrder&&window.DBCStore){DBCStore.setStatus(S.lastOrder,1);S.cart=[];S.order=S.lastOrder;S.lastOrder=null;S.hist=[];S.screen='order';toast('Pagamento aprovado');return render()} S.hist=[];S.screen='track';return render(); }
   if('copy' in d){ const code=document.getElementById('pixcode').textContent;
     try{ navigator.clipboard.writeText(code).then(()=>toast('Código copiado'),selectCode) }catch(_){ selectCode() } return; }
   if(d.go){ if(d.go==='track'){S.hist=[];S.screen='track';return render()} return go(d.go); }
 });
 function selectCode(){const el=document.getElementById('pixcode');const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r)}
+syncStore(); if(window.DBCStore) DBCStore.onChange(()=>{syncStore(); render(false);});
 render();
 })();
 </script>
