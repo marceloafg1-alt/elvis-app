@@ -1,0 +1,14 @@
+{
+  "id": "/elvis-app/entregador/",
+  "name": "DBC Entregas",
+  "short_name": "DBC Entregas",
+  "start_url": "/elvis-app/entregador/",
+  "scope": "/elvis-app/entregador/",
+  "display": "standalone",
+  "background_color": "#00213F",
+  "theme_color": "#00213F",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

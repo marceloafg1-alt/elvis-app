@@ -16,3 +16,9 @@ https://marceloafg1-alt.github.io/elvis-app/admin/ cadastra produtos e muda a si
 Os apps (versão 1 na raiz e versão 2 em `/v2/`) e o painel leem os dados de `data/store.js`.
 Nesta fase os dados ficam no armazenamento do navegador (localStorage); para ligar ao Firebase,
 basta trocar o objeto `adapter` dentro de `data/store.js`.
+
+## App do entregador
+
+https://marceloafg1-alt.github.io/elvis-app/entregador/ lista as entregas prontas, registra "Saí para entrega"
+e confirma a entrega com o código de 4 números que o cliente vê no app. Pagamento e nota fiscal são automáticos;
+separação, saída e entrega são marcadas no painel ou pelo entregador.

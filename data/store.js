@@ -67,20 +67,28 @@
   function createOrder(data){
     var list = adapter.load(KEY_O) || seedOrders();
     var last = adapter.load(KEY_N) || 4821; var no = String(last + 1); adapter.save(KEY_N, last + 1);
-    var o = { no: no, created: now(), items: data.items.map(snap), ship: data.ship, pay: data.pay, doc: data.doc || 'cpf', customer: data.customer || 'Marcos Silva', status: 0, history: [now()] };
-    if(data.paid) { o.status = 1; o.history[1] = now(); }
+    var o = { no: no, created: now(), items: data.items.map(snap), ship: data.ship, pay: data.pay, doc: data.doc || 'cpf', customer: data.customer || 'Marcos Silva', status: 0, history: [now()], code: String(1000 + Math.floor(Math.random() * 9000)), by: { 0: data.by || 'app' } };
+    if(data.addr) o.addr = data.addr; if(data.phone) o.phone = data.phone;
+    if(data.paid) { o.status = 1; o.history[1] = now(); o.by[1] = data.by === 'loja' ? 'loja' : 'automático'; }
     list.push(o); saveOrders(list); if(o.status >= 1) ensureSaleInvoice(o); return o;
   }
-  function setStatus(no, status){
+  function setStatus(no, status, by){
     var list = adapter.load(KEY_O) || seedOrders(), o = list.find(function(x){ return x.no === String(no); });
     if(!o) return;
-    o.status = status; o.history = o.history || [];
+    o.status = status; o.history = o.history || []; o.by = o.by || {}; o.by[status] = by || 'loja';
     if(status >= 0){ for(var i = 0; i <= status; i++){ if(!o.history[i]) o.history[i] = now(); } o.history.length = status + 1; }
     saveOrders(list);
     if(status >= 1) ensureSaleInvoice(o);
     if(status === -1) invoicesFor(o.no).forEach(function(n){ if(n.type === 'venda' && n.status !== 'cancelada') setInvoiceStatus(n.id, n.status === 'emitida' ? 'cancelada' : 'cancelada'); });
   }
 
+
+  // ---------- entrega ----------
+  // Código de 4 dígitos que o cliente informa ao entregador para confirmar a entrega.
+  function deliveryCode(o){ if(!o) return ''; if(o.code) return o.code; if(o.no === '4821') return '7314'; var h = 0; String(o.no).split('').forEach(function(c){ h = (h * 31 + c.charCodeAt(0)) % 9000; }); return String(1000 + h); }
+  function addrOf(o){ return (o && o.addr) || 'Rua das Indústrias, 450, galpão 3 · Distrito Industrial, Piedade - SP'; }
+  function phoneOf(o){ return (o && o.phone) || '(15) 98765-4321'; }
+  function confirmDelivery(no, code, by){ var o = order(no); if(!o || o.status !== 3 || String(code).trim() !== deliveryCode(o)) return false; setStatus(no, 4, by || 'entregador'); return true; }
 
   // ---------- preços e totais ----------
   function findProduct(id){ return allProducts().find(function(p){ return p.id === id; }) || SEED.products.find(function(p){ return p.id === id; }); }
@@ -110,7 +118,7 @@
     (adapter.load(KEY_O) || seedOrders()).forEach(function(o){
       if(o.status < 1) return;
       var inv = newInvoice(o, 'venda', totals(o).total);
-      if(o.status >= 4){ num++; inv.status = 'emitida'; inv.number = num; inv.issued = o.history[1] || o.created; inv.key = '3526' + rnd(40); }
+      if(o.status >= 1){ num++; inv.status = 'emitida'; inv.number = num; inv.issued = o.history[1] || o.created; inv.key = '3526' + rnd(40); }
       list.push(inv);
     });
     adapter.save(KEY_N + '.nf', num);
@@ -125,7 +133,8 @@
   function saveInvoices(l){ if(!adapter.save(KEY_I, l)) return false; notify(); return true; }
   function ensureSaleInvoice(o){
     var l = invoicesRaw(); if(l.some(function(n){ return n.orderNo === o.no && n.type === 'venda'; })) return;
-    l.push(newInvoice(o, 'venda', totals(o).total)); saveInvoices(l);
+    var n = newInvoice(o, 'venda', totals(o).total); l.push(n); saveInvoices(l);
+    if(settings().autoInvoice !== false) emitInvoice(n.id); // emissão automática ao confirmar o pagamento
   }
   function emitInvoice(id){
     var l = invoicesRaw(), n = l.find(function(x){ return x.id === id; }); if(!n || n.status !== 'pendente') return;
@@ -229,7 +238,7 @@
   window.DBCStore = {
     adapter: adapter.name, cats: SEED.cats,
     products: products, allProducts: allProducts, saveProduct: saveProduct, deleteProduct: deleteProduct,
-    orders: orders, order: order, createOrder: createOrder, setStatus: setStatus, steps: steps, statusLabel: statusLabel,
+    orders: orders, order: order, createOrder: createOrder, setStatus: setStatus, deliveryCode: deliveryCode, addrOf: addrOf, phoneOf: phoneOf, confirmDelivery: confirmDelivery, steps: steps, statusLabel: statusLabel,
     toCSV: toCSV, fromCSV: fromCSV, reset: reset,
     totals: totals, priceOf: priceOf,
     invoices: invoices, invoicesFor: invoicesFor, emitInvoice: emitInvoice, setInvoiceStatus: setInvoiceStatus, attachInvoiceFile: attachInvoiceFile, invoiceXML: invoiceXML,
